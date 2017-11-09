@@ -1,0 +1,29 @@
+{
+  "name": "abraia",
+  "version": "0.1.0",
+  "description": "Abraia Node SDK",
+  "main": "abraia.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abraia/abraia-nodejs.git"
+  },
+  "author": "Jorge Rodriguez Araujo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abraia/abraia-nodejs/issues"
+  },
+  "homepage": "https://github.com/abraia/abraia-nodejs#readme",
+  "dependencies": {
+    "btoa": "^1.1.2",
+    "path": "^0.12.7",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "standard": "^10.0.3"
+  }
+}
