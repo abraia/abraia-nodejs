@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Abraia Node SDK",
   "main": "abraia.js",
+  "bin": {
+    "optimize": "./index.js"
+  },
   "scripts": {
     "test": "mocha --reporter spec"
   },
@@ -18,8 +21,11 @@
   "homepage": "https://github.com/abraia/abraia-nodejs#readme",
   "dependencies": {
     "btoa": "^1.1.2",
+    "commander": "^2.11.0",
+    "glob": "^7.1.2",
     "path": "^0.12.7",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",

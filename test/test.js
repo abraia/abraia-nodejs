@@ -2,6 +2,7 @@
 
 const assert = require('chai').assert
 const path = require('path')
+const fs = require('fs')
 
 const abraia = require('../abraia')
 
@@ -19,9 +20,10 @@ describe('Abraia', function () {
   })
 
   it('save to local file', function () {
+    const filename = path.join(__dirname, '../images/optimized.jpg')
     const url = 'https://abraia.me/images/tiger.jpg'
-    const source = abraia.fromUrl(url)
-    source.toFile(path.join(__dirname, '../images/optimized.jpg'))
+    abraia.fromUrl(url).toFile(filename)
+    assert(fs.lstatSync(filename).isFile())
   })
 
   it('resize an image', function () {
