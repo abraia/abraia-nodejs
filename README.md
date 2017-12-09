@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/abraia/abraia-nodejs.svg)](https://travis-ci.org/abraia/abraia-nodejs)
+[![Coverage Status](https://coveralls.io/repos/github/abraia/abraia-nodejs/badge.svg?branch=master)](https://coveralls.io/github/abraia/abraia-nodejs?branch=master)
 
 # Abraia API client for Node.js
 

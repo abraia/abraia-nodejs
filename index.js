@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const ProgressBar = require('progress')
 const program = require('commander')
 const path = require('path')
 const glob = require('glob')
@@ -7,10 +8,13 @@ const fs = require('fs')
 const abraia = require('./abraia')
 
 program
-  .version('0.1.0')
+  .version('0.1.2')
   .description('Abraia image optimization tool')
-  .arguments('<impath>')
-  .action(function (impath) {
+  .arguments('<impath>', 'path of image or directory of images to process')
+  .option('--width <width>', 'requested image width', parseInt)
+  .option('--height <height>', 'requested image height', parseInt)
+  .action(function (impath, options) {
+    const { width, height } = options
     if (fs.lstatSync(impath).isFile()) {
       const extname = path.extname(impath)
       const basename = path.basename(impath, extname)
@@ -26,12 +30,17 @@ program
       } catch (err) {
         if (err.code !== 'EEXIST') throw err
       }
-      glob(path.join(impath, '*.{png,gif,jpg,jpeg}'), function (er, files) {
+      glob(path.join(impath, '*.{jpg,jpeg,png,gif,webp}'), function (er, files) {
+        const bar = new ProgressBar('Processing [:bar] :percent :etas', {
+          width: 40, total: files.length
+        })
         for (let filename of files) {
+          const fileSize = fs.statSync(filename).size
           const filePath = path.join(dirname, path.basename(filename))
-          console.log(`Uploading: ${filename}`)
-          abraia.fromFile(filename).toFile(filePath)
+          console.log(`${filename} -> ${fileSize}`)
+          abraia.fromFile(filename).resize({ width, height }).toFile(filePath)
           console.log(`Optimized: ${filePath}`)
+          bar.tick()
         }
       })
     }

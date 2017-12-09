@@ -1,5 +1,3 @@
-'use strict'
-
 const fs = require('fs')
 const btoa = require('btoa')
 const request = require('request-promise')
@@ -8,10 +6,22 @@ const ABRAIA_API_URL = 'https://abraia.me/api'
 const ABRAIA_API_KEY = process.env.ABRAIA_API_KEY ? process.env.ABRAIA_API_KEY : 'demo'
 const ABRAIA_API_SECRET = process.env.ABRAIA_API_SECRET ? process.env.ABRAIA_API_SECRET : 'abraia'
 
-// axios.defaults.baseURL = 'https://api.example.com'
 const authRequest = request.defaults({
   headers: {'Authorization': 'Basic ' + btoa(ABRAIA_API_KEY + ':' + ABRAIA_API_SECRET)}
 })
+
+// + var fileSize = fs.statSync(file).size;
+// + var fileStream = fs.createReadStream(file);
+// + var barOpts = {
+// +   width: 20,
+// +   total: fileSize,
+// +   clear: true
+// + };
+// + var bar = new ProgressBar(' uploading [:bar] :percent :etas', barOpts);
+// +
+// + fileStream.on('data', function (chunk) {
+// +   bar.tick(chunk.length);
+// + });
 
 class Client {
   constructor () {
@@ -59,11 +69,22 @@ class Client {
   }
 
   resize (params) {
-    if (params.width !== undefined) {
-      this._params.w = params.width
-    }
-    if (params.height !== undefined) {
-      this._params.h = params.height
+    if (this._promise !== undefined) {
+      this._promise = this._promise.then(() => {
+        if (params.width !== undefined) {
+          this._params.w = params.width
+        }
+        if (params.height !== undefined) {
+          this._params.h = params.height
+        }
+      })
+    } else {
+      if (params.width !== undefined) {
+        this._params.w = params.width
+      }
+      if (params.height !== undefined) {
+        this._params.h = params.height
+      }
     }
     return this
   }

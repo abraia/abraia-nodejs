@@ -1,10 +1,10 @@
 {
   "name": "abraia",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Abraia Node SDK",
   "main": "abraia.js",
   "bin": {
-    "optimize": "./index.js"
+    "abraia": "./index.js"
   },
   "scripts": {
     "test": "mocha --reporter spec"
@@ -24,12 +24,15 @@
     "commander": "^2.11.0",
     "glob": "^7.1.2",
     "path": "^0.12.7",
+    "progress": "^2.0.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
     "mocha": "^4.0.1",
+    "mocha-lcov-reporter": "^1.3.0",
     "standard": "^10.0.3"
   }
 }
