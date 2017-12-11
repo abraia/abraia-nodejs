@@ -19,9 +19,8 @@ program
       const extname = path.extname(impath)
       const basename = path.basename(impath, extname)
       const filePath = basename + '_o' + extname
-      console.log(`Uploading: ${impath}`)
-      abraia.fromFile(impath).toFile(filePath)
-      console.log(`Optimized: ${filePath}`)
+      abraia.fromFile(impath).resize({ width, height }).toFile(filePath)
+      console.log(`Optimizing: ${filePath}`)
     }
     if (fs.lstatSync(impath).isDirectory()) {
       const dirname = impath.replace(/\/$/, '') + '_o'
@@ -32,14 +31,13 @@ program
       }
       glob(path.join(impath, '*.{jpg,jpeg,png,gif,webp}'), function (er, files) {
         const bar = new ProgressBar('Processing [:bar] :percent :etas', {
-          width: 40, total: files.length
+          width: 55, total: files.length
         })
         for (let filename of files) {
-          const fileSize = fs.statSync(filename).size
+          const fileSize = (fs.statSync(filename).size / 1024).toFixed(1)
           const filePath = path.join(dirname, path.basename(filename))
-          console.log(`${filename} -> ${fileSize}`)
           abraia.fromFile(filename).resize({ width, height }).toFile(filePath)
-          console.log(`Optimized: ${filePath}`)
+          console.log(`Optimizing: ${fileSize}KB (${path.basename(filename)})`)
           bar.tick()
         }
       })

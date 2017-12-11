@@ -23,9 +23,9 @@ abraia.fromFile('images/lion.jpg')
   .resize({width: 600, height: 600})
   .toFile('images/lion_600x600.jpg')
 
-abraia.fromUrl('https://abraia.me/images/lion.jpg')
+abraia.fromUrl('https://abraia.me/images/random.jpg')
   .resize({width: 600, height: 400})
-  .toFile('images/lion_600x400.jpg')
+  .toFile('images/random_600x400.jpg')
 ```
 
 ## License
