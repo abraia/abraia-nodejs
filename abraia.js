@@ -2,12 +2,11 @@ const fs = require('fs')
 const btoa = require('btoa')
 const request = require('request-promise')
 
-const ABRAIA_API_URL = 'https://abraia.me/api'
-const ABRAIA_API_KEY = process.env.ABRAIA_API_KEY ? process.env.ABRAIA_API_KEY : 'demo'
-const ABRAIA_API_SECRET = process.env.ABRAIA_API_SECRET ? process.env.ABRAIA_API_SECRET : 'abraia'
+const config = require('./config')
 
+const {apiKey, apiSecret} = config.loadAuth()
 const authRequest = request.defaults({
-  headers: {'Authorization': 'Basic ' + btoa(ABRAIA_API_KEY + ':' + ABRAIA_API_SECRET)}
+  headers: {'Authorization': 'Basic ' + btoa(apiKey + ':' + apiSecret)}
 })
 
 // + var fileSize = fs.statSync(file).size;
@@ -31,13 +30,13 @@ class Client {
   }
 
   fromFile (filename) {
-    const url = ABRAIA_API_URL + '/images'
+    const url = config.apiUrl + '/images'
     const formData = {file: fs.createReadStream(filename)}
     this._promise = authRequest.post({url, formData})
       .then(body => {
         const resp = JSON.parse(body)
         console.log('Uploaded ', filename)
-        this._url = ABRAIA_API_URL + '/images/' + resp['filename']
+        this._url = config.apiUrl + '/images/' + resp['filename']
         this._params = {q: 'auto'}
       })
       .catch(err => {
@@ -47,45 +46,29 @@ class Client {
   }
 
   fromUrl (url) {
-    this._url = ABRAIA_API_URL + '/images'
+    this._url = config.apiUrl + '/images'
     this._params = {url: url, q: 'auto'}
     return this
   }
 
   toFile (filename) {
-    if (this._promise !== undefined) {
-      this._promise.then(() => {
-        authRequest.get({url: this._url, qs: this._params})
-          .on('error', (err) => console.log(err))
-          .pipe(fs.createWriteStream(filename))
-          .on('finish', () => console.log('Downloaded ', filename))
-      })
-    } else {
+    Promise.all([this._promise]).then(() => {
       authRequest.get({url: this._url, qs: this._params})
         .on('error', (err) => console.log(err))
         .pipe(fs.createWriteStream(filename))
         .on('finish', () => console.log('Downloaded ', filename))
-    }
+    })
   }
 
   resize (params) {
-    if (this._promise !== undefined) {
-      this._promise = this._promise.then(() => {
-        if (params.width !== undefined) {
-          this._params.w = params.width
-        }
-        if (params.height !== undefined) {
-          this._params.h = params.height
-        }
-      })
-    } else {
+    this._promise = Promise.all([this._promise]).then(() => {
       if (params.width !== undefined) {
         this._params.w = params.width
       }
       if (params.height !== undefined) {
         this._params.h = params.height
       }
-    }
+    })
     return this
   }
 }
