@@ -22,8 +22,10 @@ describe('Abraia', function () {
   it('save to local file', function () {
     const filename = path.join(__dirname, '../images/optimized.jpg')
     const url = 'https://abraia.me/images/random.jpg'
-    abraia.fromUrl(url).toFile(filename)
-    assert(fs.lstatSync(filename).isFile())
+    const client = abraia.fromUrl(url).toFile(filename)
+    Promise.all([client._promise]).then(() => {
+      assert(fs.lstatSync(filename).isFile())
+    })
   })
 
   it('resize an image', function () {

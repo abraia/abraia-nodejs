@@ -52,12 +52,13 @@ class Client {
   }
 
   toFile (filename) {
-    Promise.all([this._promise]).then(() => {
+    this._promise = Promise.all([this._promise]).then(() => {
       authRequest.get({url: this._url, qs: this._params})
         .on('error', (err) => console.log(err))
         .pipe(fs.createWriteStream(filename))
         .on('finish', () => console.log('Downloaded ', filename))
     })
+    return this
   }
 
   resize (params) {
