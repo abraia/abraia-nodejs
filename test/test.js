@@ -4,28 +4,29 @@ const assert = require('chai').assert
 const path = require('path')
 const fs = require('fs')
 
-const abraia = require('../abraia')
+const abraia = require('../abraia/abraia').api
 
 describe('Abraia', function () {
   it('upload a local file', function () {
-    const source = abraia.fromFile(path.join(__dirname, '../images/lion.jpg'))
-    assert(source instanceof abraia.Client)
+    abraia
+      .fromFile(path.join(__dirname, '../images/lion.jpg'))
+      .then(data => {
+        assert(data.url.endsWith('lion.jpg'))
+      })
   })
 
   it('upload a remote file', function () {
     const url = 'https://abraia.me/images/random.jpg'
-    const source = abraia.fromUrl(url)
-    assert(source instanceof abraia.Client)
-    assert(source._params.url === url)
+    abraia
+      .fromUrl(url)
+      .then(data => assert(data.params.url === url))
   })
 
   it('save to local file', function () {
     const filename = path.join(__dirname, '../images/optimized.jpg')
     const url = 'https://abraia.me/images/random.jpg'
     const client = abraia.fromUrl(url).toFile(filename)
-    Promise.all([client._promise]).then(() => {
-      assert(fs.lstatSync(filename).isFile())
-    })
+      .then(() => assert(fs.lstatSync(filename).isFile()))
   })
 
   it('resize an image', function () {

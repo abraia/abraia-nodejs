@@ -5,8 +5,8 @@ const path = require('path')
 const glob = require('glob')
 const fs = require('fs')
 
-const config = require('./config')
-const abraia = require('./abraia')
+const abraia = require('./abraia/abraia').api
+const config = require('./abraia/config')
 
 function prompt (question, callback) {
   process.stdin.resume()
