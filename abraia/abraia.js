@@ -1,73 +1,60 @@
 const fs = require('fs')
 
 const Client = require('./client')
-const config = require('./config')
 
-const {apiKey, apiSecret} = config.loadAuth()
-const client = new Client(apiKey, apiSecret)
-
-// toFile (filename) {
-//   this._promise = Promise.all([this._promise]).then(() => {
-//     authRequest.get({url: this._url, qs: this._params})
-//     .on('error', (err) => console.log(err))
-//     .pipe(fs.createWriteStream(filename))
-//     .on('finish', () => console.log('Downloaded ', filename))
-//   })
-// }
+const client = new Client()
 
 function fromFile (path) {
   return new Promise((resolve, reject) => {
     client.uploadFile(path)
       .then((data) => {
-        console.log('Uploaded ', path)
         resolve({
-          url: config.apiUrl + '/images/' + data['filename'],
+          path: data['filename'],
           params: { q: 'auto' }
         })
       })
-      .catch((err) => {
-        console.log(err.message)
-        reject(err)
-      })
+      .catch(err => reject(err))
   })
 }
 
 function fromUrl (url) {
   return new Promise((resolve, reject) => {
     resolve({
-      url: config.apiUrl + '/images',
+      path: '',
       params: { url: url, q: 'auto' }
     })
   })
 }
 
-function toFile (filename, data) {
+function toFile (path, values) {
   return new Promise((resolve, reject) => {
-    client.downloadFile(data.url, data.params)
+    client.downloadFile(values.path, values.params)
       .then((data) => {
-        fs.writeFileSync(filename, data)
-        console.log('Downloaded ', filename)
-        resolve(filename)
+        fs.writeFileSync(path, data)
+        resolve(path)
       })
       .catch(err => reject(err))
   })
 }
 
-function resize (params, data) {
+function resize (params, values) {
   return new Promise((resolve) => {
     if (params.width !== undefined) {
-      data.params.w = params.width
+      values.params.w = params.width
     }
     if (params.height !== undefined) {
-      data.params.h = params.height
+      values.params.h = params.height
     }
-    resolve(data)
+    if (params.mode !== undefined) {
+      values.params.m = params.mode
+    }
+    resolve(values)
   })
 }
 
-function remove (url) {
+function remove (path) {
   return new Promise((resolve, reject) => {
-    client.deleteFile(url)
+    client.deleteFile(path)
       .then(data => resolve(data))
       .catch(err => reject(err))
   })
@@ -86,4 +73,5 @@ const Api = (previousActions = Promise.resolve()) => {
 }
 
 const api = Api()
-exports.api = api
+
+module.exports = api

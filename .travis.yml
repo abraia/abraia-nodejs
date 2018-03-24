@@ -1,9 +1,17 @@
 language: node_js
 node_js:
-  - stable
+- stable
 install:
-  - npm install
+- npm install
 script:
-  - npm test
+- npm test
 after_success:
-  - npm run coveralls
+- npm run coveralls
+deploy:
+  provider: npm
+  email: jorge@abraiasoftware.com
+  api_key:
+    secure: fqR2fZxbnlqWuLYumL56a1HXnDFh96zCp1Pl6SOKaH69d/jp177SlpHvumgKvav4/X5HE87j8iayrgnLMuuj41rgL11JwAVGUJwkxyDBmqxpDFeDKHWZwozP2zNhaQWMqZosL1zSxU4Lbpq36itPktusuzaRgVR5Uo5+tT8h2Jvjuw7YATTguOGG3ha+gqBFxsw954v0dpR6aLLB/frjAjNQGI423z6iYlVC3+P8BLoHdOTEkuHXz3k5+DlYWejaF4f1+i8qxii4/s8BxDfSGpikCM6KS148178LJkueq7qUjI0agmyfgbZcMO8N+ybM0qGiQNSF2rkR9s5BEBG5kE8NH40pSRTedX2hoKNDvT2nVBX5/xMiD2Na59LIVhCK9Vhj0C5g2572CoCiEPEFoUODt7rCyxAjZGoJMFxh/bi2PBnh6Eb5scpxwDxMHniG2d5wdVdnLJFL5BS6fkegn/Nlw0SDXeiO6++YsKtQIHytBJaWX/UlRQx/gLKAo0we6oXsXNGE3YUDLAEMNA020dOrHks8GwuMb24jdV3l5hnGGae/meb7OrdcKWxqFcan7HUOlp0OisIHcjdU+DNVnO4VuX55+ntzuZjTy2H6ldI5S4R33vYJHo7EWM6oqiUEY3nvkbvRYdLAhrf6VZPtsu9Qg/bA5Qo9hyx1sA8vsp0=
+  on:
+    tags: true
+    repo: abraia/abraia-nodejs
