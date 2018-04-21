@@ -2,6 +2,7 @@
 
 const assert = require('chai').assert
 const path = require('path')
+const fs = require('fs')
 
 const Client = require('../abraia/client')
 
@@ -14,7 +15,8 @@ describe('Client', () => {
   }).timeout(10000)
 
   it('upload an image file', () => {
-    return client.uploadFile(path.join(__dirname, '../images/lion.jpg'))
+    const file = fs.createReadStream(path.join(__dirname, '../images/lion.jpg'))
+    return client.uploadFile(file)
       .then(data => assert(data['filename'].endsWith('lion.jpg')))
   }).timeout(10000)
 

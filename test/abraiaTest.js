@@ -38,7 +38,7 @@ describe('Abraia', function () {
   }).timeout(10000)
 
   it('download resize file', () => {
-    const filename = path.join(__dirname, '../images/resized.jpg')
+    const filename = path.join(__dirname, '../images/lion_500x500.jpg')
     return abraia
       .fromFile(path.join(__dirname, '../images/lion.jpg'))
       .resize({ width: 500, height: 500 })

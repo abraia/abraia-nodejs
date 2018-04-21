@@ -1,6 +1,3 @@
-'use strict'
-
-const fs = require('fs')
 const btoa = require('btoa')
 const axios = require('axios')
 const FormData = require('form-data')
@@ -29,9 +26,9 @@ class Client {
     })
   }
 
-  uploadFile (path) {
+  uploadFile (file) {
     const formData = new FormData()
-    formData.append('file', fs.createReadStream(path))
+    formData.append('file', file)
     return new Promise((resolve, reject) => {
       axios.post(API_URL + '/images', formData, {
         headers: formData.getHeaders(),

@@ -5,8 +5,9 @@ const Client = require('./client')
 const client = new Client()
 
 function fromFile (path) {
+  const file = fs.createReadStream(path)
   return new Promise((resolve, reject) => {
-    client.uploadFile(path)
+    client.uploadFile(file)
       .then((data) => {
         resolve({
           path: data['filename'],

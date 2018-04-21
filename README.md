@@ -3,8 +3,9 @@
 
 # Abraia API client for Node.js
 
-Node.js client for the Abraia API, used for [Abraia](https://abraia.me) to transform
-and optimize (compress) images on-line intelligently. Read more at [https://abraia.me/docs](https://abraia.me/docs).
+Node.js client for the [Abraia](https://abraia.me) services, used to transform
+and optimize (compress) images on-line intelligently. Read more at
+[https://abraia.me/docs](https://abraia.me/docs).
 
 ## Installation
 
@@ -20,13 +21,15 @@ npm install --save abraia
 const abraia = require('abraia')
 
 abraia.fromFile('images/lion.jpg')
-  .resize({width: 600, height: 600})
-  .toFile('images/lion_600x600.jpg')
+  .resize({width: 500, height: 500})
+  .toFile('images/lion_500x500.jpg')
 
 abraia.fromUrl('https://abraia.me/images/random.jpg')
   .resize({width: 600, height: 400})
   .toFile('images/random_600x400.jpg')
 ```
+
+![Smart cropped lion square](images/lion_500x500.jpg)
 
 ## License
 
