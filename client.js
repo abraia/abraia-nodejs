@@ -1,1 +1,1 @@
-module.exports = require('abraia/client.js')
+module.exports = require('./abraia/client')
