@@ -26,14 +26,20 @@ class Client {
     })
   }
 
-  uploadFile (file) {
+  uploadFile (file, callback) {
     const formData = new FormData()
     formData.append('file', file)
     return new Promise((resolve, reject) => {
       axios.post(API_URL + '/images', formData, {
         headers: formData.getHeaders(),
-        onUploadProgress: (progressEvent) => {
-          console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
+        onUploadProgress: (evt) => {
+          console.log('CALLBACK ', callback, Math.round((evt.loaded * 100) / evt.total))
+          // if (evt.lengthComputable) {
+            // typeof callback === 'function' && callback({ total: evt.total, loaded: evt.loaded })
+          // }
+          (callback instanceof Function) && callback({
+            total: evt.total, loaded: evt.loaded
+          })
         }
       }).then(resp => resolve(resp.data))
         .catch(err => reject(err))

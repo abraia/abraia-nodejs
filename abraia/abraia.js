@@ -55,7 +55,7 @@ function resize (params, values) {
 
 function remove (path) {
   return new Promise((resolve, reject) => {
-    client.deleteFile(path)
+    client.removeFile(path)
       .then(data => resolve(data))
       .catch(err => reject(err))
   })
