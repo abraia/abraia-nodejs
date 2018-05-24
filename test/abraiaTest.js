@@ -4,15 +4,13 @@ const assert = require('chai').assert
 const path = require('path')
 const fs = require('fs')
 
-const abraia = require('../abraia/abraia')
+const abraia = require('../abraia')
 
 describe('Abraia', function () {
   it('upload a local file', function () {
     return abraia
       .fromFile(path.join(__dirname, '../images/lion.jpg'))
-      .then(data => {
-        assert(data.path.endsWith('lion.jpg'))
-      })
+      .then(data => assert(data.path.endsWith('lion.jpg')))
   }).timeout(10000)
 
   it('upload a remote file', function () {
@@ -25,11 +23,11 @@ describe('Abraia', function () {
   it('download stored file', () => {
     const filename = path.join(__dirname, '../images/optimized.jpg')
     return abraia
-      .fromFile(path.join(__dirname, '../images/tiger.jpg'))
+      .fromFile(path.join(__dirname, '../images/lion.jpg'))
       .toFile(filename).then(() => assert(fs.lstatSync(filename).isFile()))
   }).timeout(10000)
 
-  it('download remote file', () => {
+  it('thumb resize', () => {
     const filename = path.join(__dirname, '../images/roptim.jpg')
     return abraia
       .fromUrl('https://abraia.me/images/random.jpg')
@@ -37,11 +35,19 @@ describe('Abraia', function () {
       .toFile(filename).then(() => assert(fs.lstatSync(filename).isFile()))
   }).timeout(10000)
 
-  it('download resize file', () => {
-    const filename = path.join(__dirname, '../images/lion_500x500.jpg')
+  it('image resize', () => {
+    const filename = path.join(__dirname, '../images/tiger_x333.jpg')
     return abraia
-      .fromFile(path.join(__dirname, '../images/lion.jpg'))
-      .resize({ width: 500, height: 500 })
+      .fromFile(path.join(__dirname, '../images/tiger.jpg'))
+      .resize({ height: 333 })
+      .toFile(filename).then(() => assert(fs.lstatSync(filename).isFile()))
+  }).timeout(10000)
+
+  it('smart resize', () => {
+    const filename = path.join(__dirname, '../images/tiger_333x333.jpg')
+    return abraia
+      .fromFile(path.join(__dirname, '../images/tiger.jpg'))
+      .resize({ width: 333, height: 333 })
       .toFile(filename).then(() => assert(fs.lstatSync(filename).isFile()))
   }).timeout(10000)
 })

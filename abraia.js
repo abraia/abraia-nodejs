@@ -9,10 +9,8 @@ function fromFile (path) {
   return new Promise((resolve, reject) => {
     client.uploadFile(file)
       .then((data) => {
-        resolve({
-          path: data['filename'],
-          params: { q: 'auto' }
-        })
+        const path = data.source.substring(12, data.source.length)
+        resolve({ path, params: { q: 'auto' } })
       })
       .catch(err => reject(err))
   })
@@ -20,10 +18,7 @@ function fromFile (path) {
 
 function fromUrl (url) {
   return new Promise((resolve, reject) => {
-    resolve({
-      path: '',
-      params: { url: url, q: 'auto' }
-    })
+    resolve({ path: '', params: { url: url, q: 'auto' } })
   })
 }
 

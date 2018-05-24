@@ -4,20 +4,20 @@ const assert = require('chai').assert
 const path = require('path')
 const fs = require('fs')
 
-const Client = require('../abraia/client')
+const Client = require('../client')
 
 const client = new Client()
 
 describe('Client', () => {
   it('list stored image files', () => {
     return client.listFiles()
-      .then(data => assert.typeOf(data, 'object'))
+      .then(files => assert.typeOf(files, 'array'))
   }).timeout(10000)
 
   it('upload an image file', () => {
     const file = fs.createReadStream(path.join(__dirname, '../images/lion.jpg'))
     return client.uploadFile(file)
-      .then(data => assert(data['filename'].endsWith('lion.jpg')))
+      .then(data => assert(data.name === 'lion.jpg'))
   }).timeout(10000)
 
   it('download an image file', () => {
