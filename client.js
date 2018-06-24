@@ -21,7 +21,15 @@ class Client {
   listFiles () {
     return new Promise((resolve, reject) => {
       axios.get(API_URL + '/images')
-        .then(resp => resolve(resp.data.files))
+        .then(resp => {
+          const files = resp.data.files
+          for (const i in files) {
+            files[i].path = files[i].source.substring(12)
+            files[i].source = `https://abraia.me${files[i].source}`
+            files[i].thumbnail = `https://abraia.me${files[i].thumbnail}`
+          }
+          resolve(files)
+        })
         .catch(err => reject(err))
     })
   }
@@ -34,13 +42,13 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.post(API_URL + '/images', formData, config)
         .then(resp => {
-          const filename = resp.data.filename
-          const source = `/api/images/${filename}`
+          const path = resp.data.filename
+          const source = `${API_URL}/images/${path}`
           let sp = source.split('/')
           const name = sp[sp.length - 1]
           sp[sp.length - 1] = `tb_${name}`
           const thumbnail = sp.join('/')
-          const file = { source, thumbnail, name }
+          const file = { source, thumbnail, name, path }
           resolve(file)
         })
         .catch(err => reject(err))

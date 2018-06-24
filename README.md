@@ -1,3 +1,4 @@
+[![npm version](https://badge.fury.io/js/abraia.svg)](https://badge.fury.io/js/abraia)
 [![Build Status](https://travis-ci.org/abraia/abraia-nodejs.svg)](https://travis-ci.org/abraia/abraia-nodejs)
 [![Coverage Status](https://coveralls.io/repos/github/abraia/abraia-nodejs/badge.svg?branch=master)](https://coveralls.io/github/abraia/abraia-nodejs?branch=master)
 
@@ -17,8 +18,8 @@ npm install --save abraia
 
 ## Usage
 
-API Keys have to be defined as environment variables (ABRAIA_API_KEY and
-ABRAIA_API_SECRET).
+You just need to defiene the API Keys as environment variables (ABRAIA_API_KEY and
+ABRAIA_API_SECRET) and use the fluent API.
 
 ```js
 const abraia = require('abraia/abraia')
