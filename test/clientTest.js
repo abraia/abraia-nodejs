@@ -31,17 +31,15 @@ describe('Client', () => {
   }).timeout(10000)
 
   it('analyze existing image', () => {
-    client.analyzeImage('https://abraia.me/images/random.jpg')
+    client.analyzeImage('0/random.jpg')
       .then(data => {
-        console.log(data)
         assert(data instanceof Object)
       })
   }).timeout(10000)
 
   it('analyze non existing image', () => {
-    client.analyzeImage('https://abraia.me/images/0/lion.jpg')
+    client.analyzeImage('0/lion.jpg')
       .catch(err => {
-        console.log(err.message)
         assert(err instanceof Object)
       })
   }).timeout(10000)

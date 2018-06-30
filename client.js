@@ -69,22 +69,15 @@ class Client {
     })
   }
 
-  analyzeImage (url, params = {}) {
-    params['url'] = url
+  analyzeImage (path, params = {}) {
     return new Promise((resolve, reject) => {
-      axios.get(API_URL + '/analysis', {
+      axios.get(`${API_URL}/analysis/${path}`, {
         params
       }).then((resp) => {
         if (resp.status === 200) {
           resolve({ status: 'success', result: resp.data.result })
-        } else if (resp.status === 201 || resp.status === 202) {
-          if (resp.data.status === 'failed' || resp.data.status === 'timeout') {
-            reject({ status: 'error', error: 'error processing the image' })
-          } else {
-            delay(1000).then(() => analyzeImage(url, params))
-          }
         } else {
-          reject({ status: 'error', error: 'unknown' })
+          resolve({ status: 'error', error: 'error processing the image' })
         }
       }).catch(err => reject({ status: 'error', error: err }))
     })
