@@ -5,10 +5,11 @@ const Client = require('./client')
 const client = new Client()
 
 function fromFile (path) {
-  const file = fs.createReadStream(path)
+  // const file = fs.createReadStream(path)
   return new Promise((resolve, reject) => {
-    client.uploadFile(file)
+    client.uploadFile(path)
       .then((data) => {
+        console.log(data)
         resolve({ path: data.path, params: { q: 'auto' } })
       })
       .catch(err => reject(err))
@@ -23,7 +24,7 @@ function fromUrl (url) {
 
 function toFile (path, values) {
   return new Promise((resolve, reject) => {
-    client.downloadFile(values.path, values.params)
+    client.transformImage(values.path, values.params)
       .then((data) => {
         fs.writeFileSync(path, data)
         resolve(path)
