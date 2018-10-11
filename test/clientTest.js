@@ -1,15 +1,17 @@
-const assert = require('chai').assert
-const path = require('path')
 const fs = require('fs')
+const path = require('path')
+const assert = require('chai').assert
 
 const Client = require('../client')
 
 const client = new Client()
 
 describe('Client', () => {
-  it('list files', () => {
-    return client.listFiles()
-      .then(({ files }) => assert.typeOf(files, 'array'))
+  it('list files', async () => {
+    const result = await client.listFiles()
+    assert(result instanceof Object)
+    assert.typeOf(result.files, 'array')
+    assert.typeOf(result.folders, 'array')
   }).timeout(10000)
 
   it('upload file', async () => {
@@ -21,25 +23,28 @@ describe('Client', () => {
   }).timeout(10000)
 
   it('download file', async () => {
-    const data = await client.downloadFile('0/lion.jpg')
-    assert(data.length === 469840)
+    const data = await client.downloadFile('0/birds.jpg')
+    assert(data.length === 47259)
   }).timeout(10000)
 
   it('analyze image', async () => {
     const result = await client.analyzeImage('0/birds.jpg')
     assert(result instanceof Object)
-  }).timeout(15000)
+    assert.typeOf(result.result, 'object')
+  }).timeout(25000)
 
   it('aesthetics image', async () => {
     const result = await client.aestheticsImage('0/birds.jpg')
     assert(result instanceof Object)
-  }).timeout(15000)
+    assert(result.result === 6.076241970062256)
+  }).timeout(10000)
 
   it('remove file', async () => {
     const result = await client.removeFile('0/lion.jpg')
     assert(result instanceof Object)
-    assert(result.name === 'lion.jpg')
-    assert(result.source === '0/lion.jpg')
+    assert(result.file instanceof Object)
+    assert(result.file.name === 'lion.jpg')
+    assert(result.file.source === '0/lion.jpg')
   }).timeout(10000)
 
   it('download non existing file', () => {
