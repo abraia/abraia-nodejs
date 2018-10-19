@@ -1,28 +1,30 @@
+const path = require('path')
 const fs = require('fs')
 
 const Client = require('./client')
 
 const client = new Client()
+let userid
 
-function fromFile (path) {
+const fromFile = async (file) => {
   // const file = fs.createReadStream(path)
+  if (!userid) userid = await client.check()
+  const basename = file.split('/').pop()
+  // console.log(path.join(userid, basename))
   return new Promise((resolve, reject) => {
-    client.uploadFile(path)
-      .then((data) => {
-        console.log(data)
-        resolve({ path: data.path, params: { q: 'auto' } })
-      })
+    client.uploadFile(file, path.join(userid, basename)) //, 'image/jpeg')
+      .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
       .catch(err => reject(err))
   })
 }
 
-function fromUrl (url) {
+const fromUrl = (url) => {
   return new Promise((resolve, reject) => {
     resolve({ path: '', params: { url: url, q: 'auto' } })
   })
 }
 
-function toFile (path, values) {
+const toFile = (path, values) => {
   return new Promise((resolve, reject) => {
     client.transformImage(values.path, values.params)
       .then((data) => {
@@ -33,7 +35,7 @@ function toFile (path, values) {
   })
 }
 
-function resize (params, values) {
+const resize = (params, values) => {
   return new Promise((resolve) => {
     if (params.width !== undefined) {
       values.params.w = params.width
@@ -48,12 +50,8 @@ function resize (params, values) {
   })
 }
 
-function remove (path) {
-  return new Promise((resolve, reject) => {
-    client.removeFile(path)
-      .then(data => resolve(data))
-      .catch(err => reject(err))
-  })
+const remove = (path) => {
+  return client.removeFile(path)
 }
 
 const Api = (previousActions = Promise.resolve()) => {

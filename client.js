@@ -19,9 +19,13 @@ class Client {
     }
   }
 
+  check () {
+    return this.listFiles().then(resp => resp.folders[0].name)
+  }
+
   listFiles (path = '') {
     return new Promise((resolve, reject) => {
-      axios.get(`${API_URL}/images/${path}`, { auth: this.auth })
+      axios.get(`${API_URL}/files/${path}`, { auth: this.auth })
         .then(resp => resolve(resp.data))
         .catch(err => reject(err))
     })

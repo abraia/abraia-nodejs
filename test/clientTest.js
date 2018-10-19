@@ -9,7 +9,6 @@ const client = new Client()
 describe('Client', () => {
   it('list files', async () => {
     const result = await client.listFiles()
-    assert(result instanceof Object)
     assert.typeOf(result.files, 'array')
     assert.typeOf(result.folders, 'array')
   }).timeout(10000)
