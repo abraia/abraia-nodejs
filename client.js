@@ -25,7 +25,32 @@ class Client {
   listFiles (path = '') {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/files/${path}`, { auth: this.auth })
-        .then(resp => resolve(resp.data))
+        .then(resp => {
+          const { files, folders } = resp.data
+          for (const i in folders) {
+            folders[i].path = folders[i].source
+            folders[i].source = `${API_URL}/files/${folders[i].source}`
+          }
+          for (const i in files) {
+            files[i].path = files[i].source
+            files[i].source = `${API_URL}/images/${files[i].source}`
+            files[i].thumbnail = `${API_URL}/files/${files[i].thumbnail}`
+          }
+          resolve({ files, folders })
+        })
+        .catch(err => reject(err))
+    })
+  }
+
+  addFolder (path) {
+    return new Promise((resolve, reject) => {
+      axios.post(`${API_URL}/files/${path}`, { auth: this.auth })
+        .then(resp => {
+          const folder = resp.data.folder
+          folder.path = folder.source
+          folder.source = `${API_URL}/files/${folder.source}`
+          resolve(folder)
+        })
         .catch(err => reject(err))
     })
   }
@@ -34,6 +59,7 @@ class Client {
     const source = path.endsWith('/') ? path.slice(0, -1) : path
     const name = (path === '') ? file.split('/').pop() : source.split('/').pop()
     // console.log(source, name)
+    const data = (typeof Blob !== 'undefined' && file instanceof Blob) ? file : file.stream
     return new Promise((resolve, reject) => {
       axios.post(`${API_URL}/files/${path}`, {
         name: file.name,
@@ -44,7 +70,7 @@ class Client {
             const uploadURL = resp.data.uploadURL
             const config = { headers: { 'Content-Type': file.type, 'Content-Length': file.size } }
             if (callback instanceof Function) config.onDownloadProgress = callback
-            axios.put(uploadURL, file.stream, config)
+            axios.put(uploadURL, data, config)
               .then(resp => {
                 if (resp.status === 200) {
                   resolve({
@@ -84,7 +110,7 @@ class Client {
     })
   }
 
-  transformImage (path, params) {
+  transformImage (path, params = {}) {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/images/${path}`, { params, responseType: 'arraybuffer' })
         .then(resp => resolve(resp.data))
@@ -100,7 +126,7 @@ class Client {
     })
   }
 
-  aestheticsImage (path) {
+  aestheticsImage (path, params = {}) {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/aesthetics/${path}`, { auth: this.auth })
         .then(resp => resolve(resp.data))
@@ -108,7 +134,7 @@ class Client {
     })
   }
 
-  transcodeVideo (path, params) {
+  processVideo (path, params = {}) {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/video/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
