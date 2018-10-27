@@ -6,13 +6,17 @@ const Client = require('./client')
 const client = new Client()
 let userid
 
-const fromFile = async (file) => {
-  // const file = fs.createReadStream(path)
+const fromFile = async (filename) => {
   if (!userid) userid = await client.check()
-  const basename = file.split('/').pop()
-  // console.log(path.join(userid, basename))
+  const basename = filename.split('/').pop()
+  const file = {
+    name: basename,
+    type: 'image/jpeg',
+    size: fs.statSync(filename)['size'],
+    stream: fs.createReadStream(filename)
+  }
   return new Promise((resolve, reject) => {
-    client.uploadFile(file, path.join(userid, basename)) //, 'image/jpeg')
+    client.uploadFile(file, path.join(userid, basename))
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
       .catch(err => reject(err))
   })

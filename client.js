@@ -1,5 +1,4 @@
 const axios = require('axios')
-const fs = require('fs')
 
 const API_URL = 'https://api.abraia.me'
 
@@ -31,19 +30,21 @@ class Client {
     })
   }
 
-  uploadFile (file, path = '', type = '', callback = undefined) {
+  uploadFile (file, path = '', callback = undefined) {
     const source = path.endsWith('/') ? path.slice(0, -1) : path
     const name = (path === '') ? file.split('/').pop() : source.split('/').pop()
+    // console.log(source, name)
     return new Promise((resolve, reject) => {
-      axios.post(`${API_URL}/files/${path}`, { name, type }, { auth: this.auth })
+      axios.post(`${API_URL}/files/${path}`, {
+        name: file.name,
+        type: file.type
+      }, { auth: this.auth })
         .then(resp => {
           if (resp.status === 201) {
             const uploadURL = resp.data.uploadURL
-            const total = fs.statSync(file)['size']
-            const stream = fs.createReadStream(file)
-            const config = { headers: { 'Content-Type': type, 'Content-Length': total } }
+            const config = { headers: { 'Content-Type': file.type, 'Content-Length': file.size } }
             if (callback instanceof Function) config.onDownloadProgress = callback
-            axios.put(uploadURL, stream, config)
+            axios.put(uploadURL, file.stream, config)
               .then(resp => {
                 if (resp.status === 200) {
                   resolve({

@@ -14,8 +14,14 @@ describe('Client', () => {
   }).timeout(25000)
 
   it('upload file', async () => {
-    const file = path.join(__dirname, '../images/lion.jpg')
-    const result = await client.uploadFile(file, '0/lion.jpg', 'image/jpeg')
+    const filename = path.join(__dirname, '../images/lion.jpg')
+    const file = {
+      name: 'lion.jpg',
+      type: 'image/jpeg',
+      size: fs.statSync(filename)['size'],
+      stream: fs.createReadStream(filename)
+    }
+    const result = await client.uploadFile(file, '0/lion.jpg')
     assert(result instanceof Object)
     assert(result.name === 'lion.jpg')
     assert(result.path === '0/lion.jpg')
