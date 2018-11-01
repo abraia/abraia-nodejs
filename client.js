@@ -44,51 +44,60 @@ class Client {
 
   addFolder (path) {
     return new Promise((resolve, reject) => {
-      axios.post(`${API_URL}/files/${path}`, { auth: this.auth })
-        .then(resp => {
-          const folder = resp.data.folder
-          folder.path = folder.source
-          folder.source = `${API_URL}/files/${folder.source}`
-          resolve(folder)
-        })
-        .catch(err => reject(err))
+      axios({
+        method: 'post',
+        url: `${API_URL}/files/${path}`,
+        auth: this.auth
+      }).then(resp => {
+        const folder = resp.data.folder
+        folder.path = folder.source
+        folder.source = `${API_URL}/files/${folder.source}`
+        resolve(folder)
+      }).catch(err => reject(err))
     })
   }
 
   uploadFile (file, path = '', callback = undefined) {
-    const source = path.endsWith('/') ? path.slice(0, -1) : path
-    const name = (path === '') ? file.split('/').pop() : source.split('/').pop()
-    // console.log(source, name)
-    const data = (typeof Blob !== 'undefined' && file instanceof Blob) ? file : file.stream
+    const source = path.endsWith('/') ? path + file.name : path
+    const name = source.split('/').pop()
     return new Promise((resolve, reject) => {
-      axios.post(`${API_URL}/files/${path}`, {
-        name: file.name,
-        type: file.type
-      }, { auth: this.auth })
-        .then(resp => {
-          if (resp.status === 201) {
-            const uploadURL = resp.data.uploadURL
-            const config = { headers: { 'Content-Type': file.type, 'Content-Length': file.size } }
-            if (callback instanceof Function) config.onDownloadProgress = callback
-            axios.put(uploadURL, data, config)
-              .then(resp => {
-                if (resp.status === 200) {
-                  resolve({
-                    name: name,
-                    path: source,
-                    source: `${API_URL}/files/${source}`,
-                    thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
-                  })
-                } else {
-                  reject(resp)
-                }
-              })
-              .catch(err => reject(err))
+      axios({
+        method: 'post',
+        url: `${API_URL}/files/${path}`,
+        data: {
+          name: file.name,
+          type: file.type
+        },
+        auth: this.auth
+      }).then(resp => {
+        if (resp.status === 201) {
+          const config = { method: 'put', url: resp.data.uploadURL }
+          if (typeof Blob !== 'undefined' && file instanceof Blob) {
+            config.data = file
+            config.headers = { 'Content-Type': file.type }
           } else {
-            reject(resp)
+            config.data = file.stream
+            config.headers = { 'Content-Type': file.type, 'Content-Length': file.size }
           }
-        })
-        .catch(err => reject(err))
+          if (callback instanceof Function) config.onUploadProgress = callback
+          axios(config)
+            .then(resp => {
+              if (resp.status === 200) {
+                resolve({
+                  name: name,
+                  path: source,
+                  source: `${API_URL}/files/${source}`,
+                  thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
+                })
+              } else {
+                reject(resp)
+              }
+            })
+            .catch(err => reject(err))
+        } else {
+          reject(resp)
+        }
+      }).catch(err => reject(err))
     })
   }
 
