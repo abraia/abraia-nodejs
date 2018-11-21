@@ -33,8 +33,8 @@ abraia.fromUrl('https://abraia.me/images/random.jpg')
   .toFile('images/random_600x400.jpg')
 ```
 
-![Resized tiger image](images/tiger_503x333.jpg)
-![Smart cropped tiger](images/tiger_333x333.jpg)
+<center>![Resized tiger image](images/tiger_503x333.jpg)
+![Smart cropped tiger](images/tiger_333x333.jpg)</center>
 
 ## License
 

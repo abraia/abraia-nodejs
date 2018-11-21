@@ -13,6 +13,13 @@ describe('Client', () => {
     assert.typeOf(result.folders, 'array')
   }).timeout(25000)
 
+  it('create folder', async () => {
+    const result = await client.addFolder('0/test/')
+    assert(result instanceof Object)
+    assert(result.name === 'test')
+    assert(result.path === '0/test/')
+  }).timeout(25000)
+
   it('upload file', async () => {
     const filename = path.join(__dirname, '../images/lion.jpg')
     const file = {
@@ -30,6 +37,14 @@ describe('Client', () => {
   it('download file', async () => {
     const data = await client.downloadFile('0/birds.jpg')
     assert(data.length === 47259)
+  }).timeout(25000)
+
+  it('move file', async () => {
+    await client.moveFile('0/birds.jpg', '0/test/birds.jpg')
+    const result = await client.moveFile('0/test/birds.jpg', '0/birds.jpg')
+    assert(result instanceof Object)
+    assert(result.name === 'birds.jpg')
+    assert(result.path === '0/birds.jpg')
   }).timeout(25000)
 
   it('analyze image', async () => {

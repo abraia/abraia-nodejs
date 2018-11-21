@@ -12,10 +12,7 @@ class Client {
   }
 
   setApiKeys (apiKey, apiSecret) {
-    this.auth = {
-      username: apiKey,
-      password: apiSecret
-    }
+    this.auth = { username: apiKey, password: apiSecret }
   }
 
   check () {
@@ -111,6 +108,19 @@ class Client {
     })
   }
 
+  moveFile (oldPath, newPath) {
+    return new Promise((resolve, reject) => {
+      axios.post(`${API_URL}/files/${newPath}`, { store: oldPath }, { auth: this.auth })
+        .then(resp => {
+          const file = resp.data.file
+          file.path = file.source
+          file.source = `${API_URL}/files/${file.source}`
+          resolve(file)
+        })
+        .catch(err => reject(err))
+    })
+  }
+
   removeFile (path) {
     return new Promise((resolve, reject) => {
       axios.delete(`${API_URL}/files/${path}`, { auth: this.auth })
@@ -137,7 +147,7 @@ class Client {
 
   aestheticsImage (path, params = {}) {
     return new Promise((resolve, reject) => {
-      axios.get(`${API_URL}/aesthetics/${path}`, { auth: this.auth })
+      axios.get(`${API_URL}/aesthetics/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
         .catch(err => reject(err))
     })
@@ -145,7 +155,7 @@ class Client {
 
   processVideo (path, params = {}) {
     return new Promise((resolve, reject) => {
-      axios.get(`${API_URL}/video/${path}`, { params, auth: this.auth })
+      axios.get(`${API_URL}/videos/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
         .catch(err => reject(err))
     })
