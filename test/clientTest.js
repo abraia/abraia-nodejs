@@ -14,7 +14,7 @@ describe('Client', () => {
   }).timeout(25000)
 
   it('create folder', async () => {
-    const result = await client.addFolder('0/test/')
+    const result = await client.createFolder('0/test/')
     assert(result instanceof Object)
     assert(result.name === 'test')
     assert(result.path === '0/test/')

@@ -39,7 +39,7 @@ class Client {
     })
   }
 
-  addFolder (path) {
+  createFolder (path) {
     return new Promise((resolve, reject) => {
       axios({
         method: 'post',
