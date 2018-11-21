@@ -21,9 +21,7 @@ describe('Abraia', () => {
 
   it('optimize image', async () => {
     const filename = path.join(__dirname, '../images/optimized.jpg')
-    await abraia
-      .fromFile(path.join(__dirname, '../images/lion.jpg'))
-      .toFile(filename)
+    await abraia.fromStore('0/lion.jpg').toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 

@@ -28,6 +28,13 @@ const fromUrl = (url) => {
   })
 }
 
+const fromStore = async (path) => {
+  if (!userid) userid = await client.check()
+  return new Promise((resolve, reject) => {
+    resolve({ path, params: { q: 'auto' } })
+  })
+}
+
 const toFile = (path, values) => {
   return new Promise((resolve, reject) => {
     client.transformImage(values.path, values.params)
@@ -63,6 +70,7 @@ const Api = (previousActions = Promise.resolve()) => {
     listFiles: (callback) => Api(previousActions.then(listFiles).then(data => callback(data))),
     fromFile: (path) => Api(previousActions.then(() => fromFile(path))),
     fromUrl: (url) => Api(previousActions.then(() => fromUrl(url))),
+    fromStore: (path) => Api(previousActions.then(() => fromStore(path))),
     resize: (params) => Api(previousActions.then(data => resize(params, data))),
     remove: () => Api(previousActions.then(data => remove(data.url))),
     toFile: (filename) => Api(previousActions.then(data => toFile(filename, data))),

@@ -30,7 +30,10 @@ abraia.fromFile('images/tiger.jpg')
 
 abraia.fromUrl('https://abraia.me/images/random.jpg')
   .resize({ width: 600 })
-  .toFile('images/random_600x400.jpg')
+  .toFile('images/random_600.jpg')
+
+abraia.fromStore('demo/birds.jpg')
+  .toFile('images/birds.jpg')
 ```
 
 <center>![Resized tiger image](images/tiger_503x333.jpg)
