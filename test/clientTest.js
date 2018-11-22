@@ -47,11 +47,11 @@ describe('Client', () => {
     assert(result.path === '0/birds.jpg')
   }).timeout(25000)
 
-  it('analyze image', async () => {
-    const result = await client.analyzeImage('0/birds.jpg')
-    assert(result instanceof Object)
-    assert.typeOf(result.result, 'object')
-  }).timeout(25000)
+  // it('analyze image', async () => {
+  //   const result = await client.analyzeImage('0/birds.jpg')
+  //   assert(result instanceof Object)
+  //   assert.typeOf(result.result, 'object')
+  // }).timeout(25000)
 
   it('aesthetics image', async () => {
     const result = await client.aestheticsImage('0/birds.jpg')
