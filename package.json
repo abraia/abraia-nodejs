@@ -9,6 +9,13 @@
     "type": "git",
     "url": "git+https://github.com/abraia/abraia-nodejs.git"
   },
+  "keywords": [
+    "image-optimization",
+    "image-compression",
+    "image-processing",
+    "abraia-api",
+    "node"
+  ],
   "author": "Jorge Rodriguez Araujo",
   "license": "MIT",
   "bugs": {

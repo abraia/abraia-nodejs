@@ -1,6 +1,6 @@
 [![npm version](https://badge.fury.io/js/abraia.svg)](https://badge.fury.io/js/abraia)
 [![Build Status](https://travis-ci.org/abraia/abraia-nodejs.svg)](https://travis-ci.org/abraia/abraia-nodejs)
-[![Coverage Status](https://coveralls.io/repos/github/abraia/abraia-nodejs/badge.svg?branch=master)](https://coveralls.io/github/abraia/abraia-nodejs?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/abraia/abraia-nodejs/badge.svg)](https://coveralls.io/github/abraia/abraia-nodejs)
 
 # Abraia API client for Node.js
 
@@ -12,32 +12,58 @@ intelligently transform and optimize (compress) images for web. Read more at
 
 Install the API client:
 
-```
+```sh
 npm install --save abraia
 ```
 
-## Usage
+And define the API Keys as environment variables (`ABRAIA_API_KEY` and
+`ABRAIA_API_SECRET`).
 
-You just need to defiene the API Keys as environment variables (ABRAIA_API_KEY and
-ABRAIA_API_SECRET) and use the fluent API.
+```sh
+export ABRAIA_API_KEY=your_api_key
+export ABRAIA_API_SECRET=your_api_secret
+```
+
+## Optimizing images
+
+Optimizing images can be directly performed using the fluent API, without
+the need to know anything about image formats and parameters.
 
 ```js
 const abraia = require('abraia/abraia')
 
+abraia.fromFile('images/lion.jpg').toFile('images/optimized.jpg')
+```
+
+This significantly reduces the JPEG image file size from 470kB to 264kB
+using our content-aware compression algorithm.
+
+## Resizing images
+
+By default, you can automatically resize and crop your images just specifying the demanded image size.
+
+```js
 abraia.fromFile('images/tiger.jpg')
   .resize({ width: 333, height: 333 })
   .toFile('images/tiger_333x333.jpg')
-
-abraia.fromUrl('https://abraia.me/images/random.jpg')
-  .resize({ width: 600 })
-  .toFile('images/random_600.jpg')
-
-abraia.fromStore('demo/birds.jpg')
-  .toFile('images/birds.jpg')
 ```
 
-<center>![Resized tiger image](images/tiger_503x333.jpg)
-![Smart cropped tiger](images/tiger_333x333.jpg)</center>
+![Resized tiger image](https://github.com/abraia/abraia-nodejs/raw/master/images/tiger_503x333.jpg)
+![Smart cropped tiger](https://github.com/abraia/abraia-nodejs/raw/master/images/tiger_333x333.jpg)
+
+*Tiger image smart cropped to a square of 333x333 pixels*
+
+Or just resize them specifying the width or the height of the image.
+
+```js
+abraia.fromFile('images/tiger.jpg')
+  .resize({ height: 333 })
+  .toFile('images/tiger_x333.jpg')
+```
+
+![Resized tiger image](https://github.com/abraia/abraia-nodejs/raw/master/images/tiger_x333.jpg)
+
+*Tiger image resized to a height of 333 pixels*
 
 ## License
 
