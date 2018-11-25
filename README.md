@@ -38,18 +38,20 @@ abraia.fromFile('images/lion.jpg').toFile('images/optimized.jpg')
 This significantly reduces the JPEG image file size from 470kB to 264kB
 using our content-aware compression algorithm.
 
-You also can optimize PNG and WebP images, or convert from one format to
+You can also optimize PNG and WebP images, or convert them from one format to
 another just changing the file name extension.
 
 ```js
+abraia.fromFile('images/jaguar.png').toFile('images/jaguar8.png')
 abraia.fromFile('images/jaguar.png').toFile('images/jaguar.jpg')
 ```
 
 ![PNG jaguar](https://github.com/abraia/abraia-nodejs/raw/master/images/jaguar.png)
+![PNG8 jaguar](https://github.com/abraia/abraia-nodejs/raw/master/images/jaguar8.png)
 ![JPEG jaguar](https://github.com/abraia/abraia-nodejs/raw/master/images/jaguar.jpg)
 
-This automatically convert the original PNG image (45KB) to a JPEG image
-(14.1KB) with a white background replacing the transparent one.
+This automatically optimize the PNG image from 45KB to 15.8KB or convert it to
+JPEG (14.1KB) with a white background replacing the transparent one.
 
 ## Resizing images
 
