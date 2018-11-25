@@ -22,7 +22,8 @@ const fromFile = async (filename) => {
   })
 }
 
-const fromUrl = (url) => {
+const fromUrl = async (url) => {
+  if (!userid) userid = await client.check()
   return new Promise((resolve, reject) => {
     resolve({ path: '', params: { url: url, q: 'auto' } })
   })
@@ -36,6 +37,8 @@ const fromStore = async (path) => {
 }
 
 const toFile = (path, values) => {
+  const ext = path.split('.').length > 1 ? path.split('.').pop().toLowerCase() : undefined
+  if (ext) values.params.fmt = ext
   return new Promise((resolve, reject) => {
     client.transformImage(values.path, values.params)
       .then((data) => {
