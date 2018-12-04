@@ -7,6 +7,11 @@ const Client = require('../client')
 const client = new Client()
 
 describe('Client', () => {
+  it('create folder', async () => {
+    const result = await client.loadUser()
+    assert(result instanceof Object)
+  }).timeout(25000)
+
   it('list files', async () => {
     const result = await client.listFiles()
     assert.typeOf(result.files, 'array')
