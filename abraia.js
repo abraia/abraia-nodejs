@@ -1,3 +1,4 @@
+const mime = require('mime')
 const path = require('path')
 const fs = require('fs')
 
@@ -6,17 +7,14 @@ const Client = require('./client')
 const client = new Client()
 let userid
 
-const fromFile = async (filename) => {
+const fromFile = async (file) => {
   if (!userid) userid = await client.check()
-  const basename = filename.split('/').pop()
-  const file = {
-    name: basename,
-    type: 'image/jpeg',
-    size: fs.statSync(filename)['size'],
-    stream: fs.createReadStream(filename)
-  }
+  const name = (file.path) ? file.path.split('/').pop() : file.split('/').pop()
+  const type = mime.getType(name)
+  const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
+  const stream = (file.contnets) ? file.contents : fs.createReadStream(file)
   return new Promise((resolve, reject) => {
-    client.uploadFile(file, path.join(userid, basename))
+    client.uploadFile({ name, type, size, stream }, path.join(userid, name))
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
       .catch(err => reject(err))
   })
@@ -34,6 +32,10 @@ const fromStore = async (path) => {
   return new Promise((resolve, reject) => {
     resolve({ path, params: { q: 'auto' } })
   })
+}
+
+const toBuffer = (values) => {
+  return client.transformImage(values.path, values.params)
 }
 
 const toFile = (path, values) => {
@@ -76,6 +78,7 @@ const Api = (previousActions = Promise.resolve()) => {
     fromStore: (path) => Api(previousActions.then(() => fromStore(path))),
     resize: (params) => Api(previousActions.then(data => resize(params, data))),
     remove: () => Api(previousActions.then(data => remove(data.url))),
+    toBuffer: () => Api(previousActions.then(data => toBuffer(data))),
     toFile: (filename) => Api(previousActions.then(data => toFile(filename, data))),
     then: (callback) => Api(previousActions.then(data => callback(data)))
   }

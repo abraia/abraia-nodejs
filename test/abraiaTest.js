@@ -25,6 +25,11 @@ describe('Abraia', () => {
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 
+  it('optimize buffer image', async () => {
+    const data = await abraia.fromStore('0/lion.jpg').toBuffer()
+    assert(Buffer.isBuffer(data))
+  }).timeout(25000)
+
   it('thumb resize image', async () => {
     const filename = path.join(__dirname, '../images/roptim.jpg')
     await abraia
