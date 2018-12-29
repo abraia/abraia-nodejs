@@ -12,7 +12,7 @@ const fromFile = async (file) => {
   const name = (file.path) ? file.path.split('/').pop() : file.split('/').pop()
   const type = mime.getType(name)
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
-  const stream = (file.contnets) ? file.contents : fs.createReadStream(file)
+  const stream = (file.contents) ? file.contents : fs.createReadStream(file)
   return new Promise((resolve, reject) => {
     client.uploadFile({ name, type, size, stream }, path.join(userid, name))
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
