@@ -12,12 +12,11 @@ describe('Abraia', () => {
     assert(result.path.endsWith('lion.jpg'))
   }).timeout(25000)
 
-  // it('upload a remote file', () => {
-  //   const url = 'https://abraia.me/images/random.jpg'
-  //   return abraia
-  //     .fromUrl(url)
-  //     .then(data => assert(data.params.url === url))
-  // }).timeout(25000)
+  it('upload remote file', async () => {
+    const url = 'https://api.abraia.me/files/demo/birds.jpg'
+    const result = await abraia.fromUrl(url)
+    assert(result.path.endsWith('birds.jpg'))
+  }).timeout(25000)
 
   it('optimize image', async () => {
     const filename = path.join(__dirname, '../images/optimized.jpg')

@@ -25,6 +25,14 @@ describe('Client', () => {
     assert(result.path === '0/test/')
   }).timeout(25000)
 
+  it('upload remote', async () => {
+    const url = 'https://api.abraia.me/files/demo/birds.jpg'
+    const result = await client.uploadRemote(url, '0/')
+    assert(result instanceof Object)
+    assert(result.name === 'birds.jpg')
+    assert(result.path === '0/birds.jpg')
+  }).timeout(25000)
+
   it('upload file', async () => {
     const filename = path.join(__dirname, '../images/lion.jpg')
     const file = {
@@ -40,8 +48,8 @@ describe('Client', () => {
   }).timeout(25000)
 
   it('download file', async () => {
-    const data = await client.downloadFile('0/birds.jpg')
-    assert(data.length === 47259)
+    const data = await client.downloadFile('0/lion.jpg')
+    assert(data.length === 469840)
   }).timeout(25000)
 
   it('move file', async () => {
@@ -58,11 +66,11 @@ describe('Client', () => {
   //   assert.typeOf(result.result, 'object')
   // }).timeout(25000)
 
-  it('aesthetics image', async () => {
-    const result = await client.aestheticsImage('0/birds.jpg')
-    assert(result instanceof Object)
-    assert(result.result === 6.076241970062256)
-  }).timeout(25000)
+  // it('aesthetics image', async () => {
+  //   const result = await client.aestheticsImage('0/birds.jpg')
+  //   assert(result instanceof Object)
+  //   assert(result.result === 6.076241970062256)
+  // }).timeout(25000)
 
   it('remove file', async () => {
     const result = await client.removeFile('0/lion.jpg')

@@ -62,6 +62,26 @@ class Client {
     })
   }
 
+  uploadRemote (url, path) {
+    return new Promise((resolve, reject) => {
+      axios({
+        method: 'post',
+        url: `${API_URL}/files/${path}`,
+        data: { url },
+        auth: this.auth
+      }).then(resp => {
+        if (resp.status === 201) {
+          const file = resp.data.file
+          file.path = file.source
+          file.source = `${API_URL}/files/${file.source}`
+          resolve(file)
+        } else {
+          reject(resp)
+        }
+      }).catch(err => reject(err))
+    })
+  }
+
   uploadFile (file, path = '', callback = undefined) {
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()

@@ -23,7 +23,9 @@ const fromFile = async (file) => {
 const fromUrl = async (url) => {
   if (!userid) userid = await client.check()
   return new Promise((resolve, reject) => {
-    resolve({ path: '', params: { url: url, q: 'auto' } })
+    client.uploadRemote(url, `${userid}/`)
+      .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
+      .catch(err => reject(err))
   })
 }
 
