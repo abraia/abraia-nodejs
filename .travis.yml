@@ -6,7 +6,7 @@ install:
 script:
 - npm test
 after_success:
-- npm run coveralls
+- npm run coverage
 deploy:
   provider: npm
   email: jorge@abraiasoftware.com

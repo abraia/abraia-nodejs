@@ -3,7 +3,8 @@
   "version": "0.4.1",
   "description": "Abraia Node SDK",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "nyc mocha --reporter spec",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "coveralls": "^3.0.2",
     "mocha": "^4.1.0",
     "mocha-lcov-reporter": "^1.3.0",
+    "nyc": "^13.1.0",
     "standard": "^10.0.3"
   }
 }

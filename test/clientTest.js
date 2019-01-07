@@ -47,17 +47,17 @@ describe('Client', () => {
     assert(result.path === '0/lion.jpg')
   }).timeout(25000)
 
-  it('download file', async () => {
-    const data = await client.downloadFile('0/lion.jpg')
-    assert(data.length === 469840)
-  }).timeout(25000)
-
   it('move file', async () => {
     await client.moveFile('0/birds.jpg', '0/test/birds.jpg')
     const result = await client.moveFile('0/test/birds.jpg', '0/birds.jpg')
     assert(result instanceof Object)
     assert(result.name === 'birds.jpg')
     assert(result.path === '0/birds.jpg')
+  }).timeout(25000)
+
+  it('download file', async () => {
+    const data = await client.downloadFile('0/lion.jpg')
+    assert(data.length === 469840)
   }).timeout(25000)
 
   // it('analyze image', async () => {

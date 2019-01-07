@@ -126,16 +126,6 @@ class Client {
     })
   }
 
-  downloadFile (path, callback = undefined) {
-    const config = { responseType: 'arraybuffer' }
-    if (callback instanceof Function) config.onDownloadProgress = callback
-    return new Promise((resolve, reject) => {
-      axios.get(`${API_URL}/files/${path}`, config)
-        .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
-    })
-  }
-
   moveFile (oldPath, newPath) {
     return new Promise((resolve, reject) => {
       axios.post(`${API_URL}/files/${newPath}`, { store: oldPath }, { auth: this.auth })
@@ -145,6 +135,16 @@ class Client {
           file.source = `${API_URL}/files/${file.source}`
           resolve(file)
         })
+        .catch(err => reject(err))
+    })
+  }
+
+  downloadFile (path, callback = undefined) {
+    const config = { responseType: 'arraybuffer' }
+    if (callback instanceof Function) config.onDownloadProgress = callback
+    return new Promise((resolve, reject) => {
+      axios.get(`${API_URL}/files/${path}`, config)
+        .then(resp => resolve(resp.data))
         .catch(err => reject(err))
     })
   }
