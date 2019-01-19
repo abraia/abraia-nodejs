@@ -1,5 +1,4 @@
 const mime = require('mime')
-const path = require('path')
 const fs = require('fs')
 
 const Client = require('./client')
@@ -14,7 +13,7 @@ const fromFile = async (file) => {
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
   const stream = (file.contents) ? file.contents : fs.createReadStream(file)
   return new Promise((resolve, reject) => {
-    client.uploadFile({ name, type, size, stream }, path.join(userid, name))
+    client.uploadFile({ name, type, size, stream }, `${userid}/${name}`)
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
       .catch(err => reject(err))
   })
@@ -32,7 +31,7 @@ const fromUrl = async (url) => {
 const fromStore = async (path) => {
   if (!userid) userid = await client.check()
   return new Promise((resolve, reject) => {
-    resolve({ path, params: { q: 'auto' } })
+    resolve({ path: `${userid}/${path}`, params: {} })
   })
 }
 
@@ -41,8 +40,9 @@ const toBuffer = (values) => {
 }
 
 const toFile = (path, values) => {
-  const ext = path.split('.').length > 1 ? path.split('.').pop().toLowerCase() : undefined
-  if (ext) values.params.fmt = ext
+  if (Object.keys(values.params).length && path.split('.').length) {
+    values.params.fmt = path.split('.').pop().toLowerCase()
+  }
   return new Promise((resolve, reject) => {
     client.transformImage(values.path, values.params)
       .then((data) => {
@@ -68,8 +68,8 @@ const resize = (params, values) => {
   })
 }
 
-const remove = (path) => {
-  return client.removeFile(path)
+const remove = (values) => {
+  return client.removeFile(values.path)
 }
 
 const Api = (previousActions = Promise.resolve()) => {
@@ -79,7 +79,7 @@ const Api = (previousActions = Promise.resolve()) => {
     fromUrl: (url) => Api(previousActions.then(() => fromUrl(url))),
     fromStore: (path) => Api(previousActions.then(() => fromStore(path))),
     resize: (params) => Api(previousActions.then(data => resize(params, data))),
-    remove: () => Api(previousActions.then(data => remove(data.url))),
+    remove: () => Api(previousActions.then(data => remove(data))),
     toBuffer: () => Api(previousActions.then(data => toBuffer(data))),
     toFile: (filename) => Api(previousActions.then(data => toFile(filename, data))),
     then: (callback) => Api(previousActions.then(data => callback(data)))

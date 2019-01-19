@@ -26,8 +26,8 @@ export ABRAIA_API_SECRET=your_api_secret
 
 ## Optimizing images
 
-Optimizing images can be directly performed using the fluent API, without
-the need to know anything about image formats and parameters.
+Optimizing images can be directly performed using the fluent API, not knowing
+anything about web image formats and parameters.
 
 ```js
 const abraia = require('abraia/abraia')
@@ -38,8 +38,8 @@ abraia.fromFile('images/lion.jpg').toFile('images/optimized.jpg')
 This significantly reduces the JPEG image file size from 470kB to 264kB
 using our content-aware compression algorithm.
 
-You can also optimize PNG and WebP images, or convert them from one format to
-another just changing the file name extension.
+You can also optimize PNG, GIF and WebP images, or convert them from one format
+to another just changing the file name extension.
 
 ```js
 abraia.fromFile('images/jaguar.png').toFile('images/jaguar8.png')

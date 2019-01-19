@@ -20,12 +20,12 @@ describe('Abraia', () => {
 
   it('optimize image', async () => {
     const filename = path.join(__dirname, '../images/optimized.jpg')
-    await abraia.fromStore('0/lion.jpg').toFile(filename)
+    await abraia.fromStore('lion.jpg').toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 
   it('optimize buffer image', async () => {
-    const data = await abraia.fromStore('0/lion.jpg').toBuffer()
+    const data = await abraia.fromStore('lion.jpg').toBuffer()
     assert(Buffer.isBuffer(data))
   }).timeout(25000)
 
@@ -54,5 +54,16 @@ describe('Abraia', () => {
       .resize({ width: 333, height: 333 })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
+  }).timeout(25000)
+
+  it('restore stored image', async () => {
+    const filename = path.join(__dirname, '../images/lion.bak.jpg')
+    await abraia.fromStore('lion.jpg').toFile(filename)
+    assert(fs.lstatSync(filename).isFile())
+  }).timeout(25000)
+
+  it('remove stored image', async () => {
+    const result = await abraia.fromStore('lion.jpg').remove()
+    assert(result.file.name === 'lion.jpg')
   }).timeout(25000)
 })
