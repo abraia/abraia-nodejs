@@ -7,9 +7,15 @@ const Client = require('../client')
 const client = new Client()
 
 describe('Client', () => {
-  it('create folder', async () => {
+  it('check key', async () => {
+    const userid = await client.check()
+    assert(userid === '0')
+  }).timeout(25000)
+
+  it('load user', async () => {
     const result = await client.loadUser()
     assert(result instanceof Object)
+    assert(result.user.id === '0')
   }).timeout(25000)
 
   it('list files', async () => {
@@ -87,6 +93,11 @@ describe('Client', () => {
 
   it('analyze non existing image', () => {
     client.analyzeImage('0/lion.jpg')
+      .catch(err => assert(err instanceof Object))
+  }).timeout(25000)
+
+  it('aesthetics non existing image', () => {
+    client.aestheticsImage('0/lion.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(25000)
 })

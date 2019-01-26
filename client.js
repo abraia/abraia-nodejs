@@ -17,7 +17,7 @@ class Client {
   }
 
   check () {
-    return this.listFiles().then(resp => resp.folders[0].name)
+    return this.loadUser().then(resp => resp.user.id)
   }
 
   loadUser () {
