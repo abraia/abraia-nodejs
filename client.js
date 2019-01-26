@@ -4,9 +4,10 @@ const API_URL = 'https://api.abraia.me'
 
 class Client {
   constructor () {
-    const apiKey = process.env.ABRAIA_API_KEY
-    const apiSecret = process.env.ABRAIA_API_SECRET
-    if ((apiKey !== undefined) && (apiSecret !== undefined)) {
+    const abraiaKey = process.env.ABRAIA_KEY
+    if (abraiaKey) {
+      const [apiKey, apiSecret] = Buffer.from(
+        abraiaKey, 'base64').toString('binary').split(':')
       this.setApiKeys(apiKey, apiSecret)
     }
   }

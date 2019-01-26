@@ -1,12 +1,13 @@
-[![npm version](https://badge.fury.io/js/abraia.svg)](https://badge.fury.io/js/abraia)
+[![npm version](https://badge.fury.io/js/abraia.svg)](https://www.npmjs.com/package/abraia)
 [![Build Status](https://travis-ci.org/abraia/abraia-nodejs.svg)](https://travis-ci.org/abraia/abraia-nodejs)
 [![Coverage Status](https://coveralls.io/repos/github/abraia/abraia-nodejs/badge.svg)](https://coveralls.io/github/abraia/abraia-nodejs)
+![npm vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/abraia.svg)
 
 # Abraia API client for Node.js
 
 Node.js client for [Abraia](https://abraia.me) services. It is used to
 intelligently transform and optimize (compress) images for web. Read more at
-[https://abraia.me/docs](https://abraia.me/docs).
+[https://abraia.me/docs](https://abraia.me/docs/image-optimization).
 
 ## Installation
 
@@ -16,12 +17,11 @@ Install the API client:
 npm install --save abraia
 ```
 
-And define the API Keys as environment variables (`ABRAIA_API_KEY` and
-`ABRAIA_API_SECRET`).
+Get your [free API key](https://abraia.me/docs/getting-started) and define the
+`ABRAIA_KEY` environment variable.
 
 ```sh
-export ABRAIA_API_KEY=your_api_key
-export ABRAIA_API_SECRET=your_api_secret
+export ABRAIA_KEY=your_api_key
 ```
 
 ## Optimizing images
