@@ -5,9 +5,8 @@
 
 # Abraia API client for Node.js
 
-Node.js client for [Abraia](https://abraia.me) services. It is used to
-intelligently transform and optimize (compress) images for web. Read more at
-[https://abraia.me/docs](https://abraia.me/docs/image-optimization).
+Node.js client for [Abraia](https://abraia.me) services. It is used to smartly
+[optimize images for web](https://abraia.me/docs/image-optimization).
 
 ## Installation
 

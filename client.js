@@ -86,24 +86,22 @@ class Client {
   uploadFile (file, path = '', callback = undefined) {
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()
+    const type = (file.type) ? file.type : 'binary/octet-stream'
     return new Promise((resolve, reject) => {
       axios({
         method: 'post',
         url: `${API_URL}/files/${path}`,
-        data: {
-          name: file.name,
-          type: file.type
-        },
+        data: { name, type },
         auth: this.auth
       }).then(resp => {
         if (resp.status === 201) {
           const config = { method: 'put', url: resp.data.uploadURL }
           if (typeof Blob !== 'undefined' && file instanceof Blob) {
             config.data = file
-            config.headers = { 'Content-Type': file.type }
+            config.headers = { 'Content-Type': type }
           } else {
             config.data = file.stream
-            config.headers = { 'Content-Type': file.type, 'Content-Length': file.size }
+            config.headers = { 'Content-Type': type, 'Content-Length': file.size }
           }
           if (callback instanceof Function) config.onUploadProgress = callback
           axios(config)
