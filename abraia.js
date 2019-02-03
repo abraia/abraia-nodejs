@@ -55,14 +55,10 @@ const toFile = (path, values) => {
 
 const resize = (params, values) => {
   return new Promise((resolve) => {
-    if (params.width !== undefined) {
-      values.params.w = params.width
-    }
-    if (params.height !== undefined) {
-      values.params.h = params.height
-    }
-    if (params.mode !== undefined) {
-      values.params.m = params.mode
+    if (params) {
+      if (params.width) values.params.w = params.width
+      if (params.height) values.params.h = params.height
+      if (params.mode) values.params.m = params.mode
     }
     resolve(values)
   })
