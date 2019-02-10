@@ -7,6 +7,11 @@ const fs = require('fs')
 const abraia = require('../abraia')
 
 describe('Abraia', () => {
+  it('list stored files', async () => {
+    const result = await abraia.listFiles()
+    assert(result instanceof Object)
+  }).timeout(25000)
+
   it('upload local file', async () => {
     const result = await abraia.fromFile(path.join(__dirname, '../images/lion.jpg'))
     assert(result.path.endsWith('lion.jpg'))

@@ -7,11 +7,6 @@ const Client = require('../client')
 const client = new Client()
 
 describe('Client', () => {
-  it('check key', async () => {
-    const userid = await client.check()
-    assert(userid === '0')
-  }).timeout(25000)
-
   it('load user', async () => {
     const result = await client.loadUser()
     assert(result instanceof Object)

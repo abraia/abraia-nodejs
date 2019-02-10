@@ -16,10 +16,6 @@ class Client {
     this.auth = { username: apiKey, password: apiSecret }
   }
 
-  check () {
-    return this.loadUser().then(resp => resp.user.id)
-  }
-
   loadUser () {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/users`, { auth: this.auth })
