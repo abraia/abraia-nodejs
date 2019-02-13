@@ -88,7 +88,8 @@ const Api = (previousActions = Promise.resolve()) => {
     remove: () => Api(previousActions.then(data => remove(data))),
     toBuffer: () => Api(previousActions.then(data => toBuffer(data))),
     toFile: (filename) => Api(previousActions.then(data => toFile(filename, data))),
-    then: (callback) => Api(previousActions.then(data => callback(data)))
+    then: (callback) => Api(previousActions.then(data => callback(data))),
+    catch: (callback) => Api(previousActions.catch(data => callback(data)))
   }
 }
 

@@ -1,7 +1,4 @@
-'use strict'
-
 const assert = require('chai').assert
-const path = require('path')
 const fs = require('fs')
 
 const abraia = require('../abraia')
@@ -13,7 +10,7 @@ describe('Abraia', () => {
   }).timeout(25000)
 
   it('upload local file', async () => {
-    const result = await abraia.fromFile(path.join(__dirname, '../images/lion.jpg'))
+    const result = await abraia.fromFile('images/lion.jpg')
     assert(result.path.endsWith('lion.jpg'))
   }).timeout(25000)
 
@@ -23,10 +20,14 @@ describe('Abraia', () => {
     assert(result.path.endsWith('birds.jpg'))
   }).timeout(25000)
 
+  it('upload unexisting file', () => {
+    abraia.fromFile('lion.jpg')
+      .catch(err => assert(err instanceof Object))
+  }).timeout(25000)
+
   it('optimize image', async () => {
-    const filename = path.join(__dirname, '../images/optimized.jpg')
-    await abraia.fromStore('lion.jpg').toFile(filename)
-    assert(fs.lstatSync(filename).isFile())
+    await abraia.fromStore('lion.jpg').toFile('images/optimized.jpg')
+    assert(fs.lstatSync('images/optimized.jpg').isFile())
   }).timeout(25000)
 
   it('optimize buffer image', async () => {
@@ -35,36 +36,32 @@ describe('Abraia', () => {
   }).timeout(25000)
 
   it('thumb resize image', async () => {
-    const filename = path.join(__dirname, '../images/roptim.jpg')
-    await abraia
-      .fromFile(path.join(__dirname, '../images/lion.jpg'))
+    const filename = 'images/roptim.jpg'
+    await abraia.fromFile('images/lion.jpg')
       .resize({ width: 500, height: 500, mode: 'thumb' })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 
   it('height resize image', async () => {
-    const filename = path.join(__dirname, '../images/tiger_x333.jpg')
-    await abraia
-      .fromFile(path.join(__dirname, '../images/tiger.jpg'))
+    const filename = 'images/tiger_x333.jpg'
+    await abraia.fromFile('images/tiger.jpg')
       .resize({ height: 333 })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 
   it('smart resize image', async () => {
-    const filename = path.join(__dirname, '../images/tiger_333x333.jpg')
-    await abraia
-      .fromFile(path.join(__dirname, '../images/tiger.jpg'))
+    const filename = 'images/tiger_333x333.jpg'
+    await abraia.fromFile('images/tiger.jpg')
       .resize({ width: 333, height: 333 })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 
   it('restore stored image', async () => {
-    const filename = path.join(__dirname, '../images/lion.bak.jpg')
-    await abraia.fromStore('lion.jpg').toFile(filename)
-    assert(fs.lstatSync(filename).isFile())
+    await abraia.fromStore('lion.jpg').toFile('images/lion.bak.jpg')
+    assert(fs.lstatSync('images/lion.bak.jpg').isFile())
   }).timeout(25000)
 
   it('remove stored image', async () => {
