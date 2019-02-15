@@ -40,7 +40,8 @@ const fromStore = async (path) => {
   })
 }
 
-const toBuffer = (values) => {
+const toBuffer = (params, values) => {
+  if (params && params.fmt) values.params.fmt = params.fmt
   const type = mime.getType(values.path)
   if (type.split('/')[0] === 'video') {
     return client.processVideo(values.path, values.params)
@@ -84,10 +85,10 @@ const Api = (previousActions = Promise.resolve()) => {
     fromFile: (path) => Api(previousActions.then(() => fromFile(path))),
     fromUrl: (url) => Api(previousActions.then(() => fromUrl(url))),
     fromStore: (path) => Api(previousActions.then(() => fromStore(path))),
-    resize: (params) => Api(previousActions.then(data => resize(params, data))),
-    remove: () => Api(previousActions.then(data => remove(data))),
-    toBuffer: () => Api(previousActions.then(data => toBuffer(data))),
-    toFile: (filename) => Api(previousActions.then(data => toFile(filename, data))),
+    resize: (params) => Api(previousActions.then(values => resize(params, values))),
+    remove: () => Api(previousActions.then(values => remove(values))),
+    toBuffer: (params) => Api(previousActions.then(values => toBuffer(params, values))),
+    toFile: (filename) => Api(previousActions.then(values => toFile(filename, values))),
     then: (callback) => Api(previousActions.then(data => callback(data))),
     catch: (callback) => Api(previousActions.catch(data => callback(data)))
   }

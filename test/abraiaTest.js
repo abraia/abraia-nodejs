@@ -35,6 +35,11 @@ describe('Abraia', () => {
     assert(Buffer.isBuffer(data))
   }).timeout(25000)
 
+  it('convert buffer image', async () => {
+    const data = await abraia.fromStore('lion.jpg').toBuffer({ fmt: 'webp' })
+    assert(Buffer.isBuffer(data))
+  }).timeout(25000)
+
   it('thumb resize image', async () => {
     const filename = 'images/roptim.jpg'
     await abraia.fromFile('images/lion.jpg')
