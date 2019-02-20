@@ -1,3 +1,6 @@
+// Setting Global follow-redirects maxBodyLength
+const followRedirects = require('follow-redirects')
+followRedirects.maxBodyLength = 100 * 1024 * 1024; // 100 MB
 const axios = require('axios')
 
 const API_URL = 'https://api.abraia.me'

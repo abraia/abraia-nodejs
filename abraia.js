@@ -43,7 +43,7 @@ const fromStore = async (path) => {
 const toBuffer = (params, values) => {
   if (params && params.fmt) values.params.fmt = params.fmt
   const type = mime.getType(values.path)
-  if (type.split('/')[0] === 'video') {
+  if (type && type.split('/')[0] === 'video') {
     return client.processVideo(values.path, values.params)
   } else {
     return client.transformImage(values.path, values.params)
