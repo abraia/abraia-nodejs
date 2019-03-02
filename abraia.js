@@ -1,6 +1,7 @@
 const mime = require('mime')
 const fs = require('fs')
 
+const { folder } = require('./config')
 const Client = require('./client')
 
 const client = new Client()
@@ -18,7 +19,7 @@ const fromFile = async (file) => {
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
   const stream = (file.contents) ? file.contents : fs.createReadStream(file)
   return new Promise((resolve, reject) => {
-    client.uploadFile({ name, type, size, stream }, `${userid}/${name}`)
+    client.uploadFile({ name, type, size, stream }, `${userid}/${folder}${name}`)
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
       .catch(err => reject(err))
   })
@@ -27,7 +28,7 @@ const fromFile = async (file) => {
 const fromUrl = async (url) => {
   if (!userid) userid = await client.loadUser().then(resp => resp.user.id)
   return new Promise((resolve, reject) => {
-    client.uploadRemote(url, `${userid}/`)
+    client.uploadRemote(url, `${userid}/${folder}`)
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
       .catch(err => reject(err))
   })
