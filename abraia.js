@@ -7,13 +7,27 @@ const Client = require('./client')
 const client = new Client()
 let userid
 
-const listFiles = async (path = '') => {
-  if (!userid) userid = await client.loadUser().then(resp => resp.user.id)
+const userId = async () => {
+  try {
+    const resp = await user()
+    return resp.id
+  } catch (e) {
+    return undefined
+  }
+}
+
+const user = async () => {
+  const resp = await client.loadUser()
+  return resp.user
+}
+
+const files = async (path = '') => {
+  if (!userid) userid = await userId()
   return client.listFiles(`${userid}/${path}`)
 }
 
 const fromFile = async (file) => {
-  if (!userid) userid = await client.loadUser().then(resp => resp.user.id)
+  if (!userid) userid = await userId()
   const name = (file.path) ? file.path.split('/').pop() : file.split('/').pop()
   const type = mime.getType(name)
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
@@ -26,7 +40,7 @@ const fromFile = async (file) => {
 }
 
 const fromUrl = async (url) => {
-  if (!userid) userid = await client.loadUser().then(resp => resp.user.id)
+  if (!userid) userid = await userId()
   return new Promise((resolve, reject) => {
     client.uploadRemote(url, `${userid}/${folder}`)
       .then(resp => resolve({ path: resp.path, params: { q: 'auto' } }))
@@ -35,7 +49,7 @@ const fromUrl = async (url) => {
 }
 
 const fromStore = async (path) => {
-  if (!userid) userid = await client.loadUser().then(resp => resp.user.id)
+  if (!userid) userid = await userId()
   return new Promise((resolve, reject) => {
     resolve({ path: `${userid}/${path}`, params: {} })
   })
@@ -82,7 +96,8 @@ const remove = (values) => {
 
 const Api = (previousActions = Promise.resolve()) => {
   return {
-    listFiles: (path) => Api(previousActions.then(() => listFiles(path))),
+    user: () => Api(previousActions.then(() => user())),
+    files: (path) => Api(previousActions.then(() => files(path))),
     fromFile: (path) => Api(previousActions.then(() => fromFile(path))),
     fromUrl: (url) => Api(previousActions.then(() => fromUrl(url))),
     fromStore: (path) => Api(previousActions.then(() => fromStore(path))),

@@ -4,8 +4,13 @@ const fs = require('fs')
 const abraia = require('../abraia')
 
 describe('Abraia', () => {
+  it('load user data', async () => {
+    const result = await abraia.user()
+    assert(result instanceof Object)
+  }).timeout(25000)
+
   it('list stored files', async () => {
-    const result = await abraia.listFiles()
+    const result = await abraia.files()
     assert(result instanceof Object)
   }).timeout(25000)
 

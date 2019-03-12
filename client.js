@@ -5,6 +5,13 @@ const axios = require('axios')
 
 const { API_URL } = require('./config')
 
+class APIError extends Error {
+  constructor(message, code = 0) {
+    super(message)
+    this.code = code
+  }
+}
+
 class Client {
   constructor () {
     const abraiaKey = process.env.ABRAIA_KEY
@@ -23,7 +30,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/users`, { auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -43,7 +50,7 @@ class Client {
           }
           resolve({ files, folders })
         })
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -58,7 +65,7 @@ class Client {
         folder.path = folder.source
         folder.source = `${API_URL}/files/${folder.source}`
         resolve(folder)
-      }).catch(err => reject(err))
+      }).catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -78,7 +85,7 @@ class Client {
         } else {
           reject(resp)
         }
-      }).catch(err => reject(err))
+      }).catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -116,11 +123,11 @@ class Client {
                 reject(resp)
               }
             })
-            .catch(err => reject(err))
+            .catch(err => reject(new APIError(err.response.data, err.response.status)))
         } else {
           reject(resp)
         }
-      }).catch(err => reject(err))
+      }).catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -133,17 +140,17 @@ class Client {
           file.source = `${API_URL}/files/${file.source}`
           resolve(file)
         })
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
   downloadFile (path, callback = undefined) {
-    const config = { responseType: 'arraybuffer' }
+    const config = { responseType: 'arraybuffer', auth: this.auth }
     if (callback instanceof Function) config.onDownloadProgress = callback
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/files/${path}`, config)
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -151,15 +158,16 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.delete(`${API_URL}/files/${path}`, { auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
   transformImage (path, params = {}) {
+    const config = { params, responseType: 'arraybuffer', auth: this.auth }
     return new Promise((resolve, reject) => {
-      axios.get(`${API_URL}/images/${path}`, { params, responseType: 'arraybuffer' })
+      axios.get(`${API_URL}/images/${path}`, config)
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -167,7 +175,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/analysis/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -175,7 +183,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/aesthetics/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 
@@ -183,7 +191,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/videos/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(err))
+        .catch(err => reject(new APIError(err.response.data, err.response.status)))
     })
   }
 }
