@@ -62,9 +62,8 @@ describe('Client', () => {
   }).timeout(25000)
 
   // it('analyze image', async () => {
-  //   const result = await client.analyzeImage('0/birds.jpg')
+  //   const result = await client.analyzeImage('0/lion.jpg', { m: 'fcrop', ar: 1 })
   //   assert(result instanceof Object)
-  //   assert.typeOf(result.result, 'object')
   // }).timeout(25000)
 
   // it('aesthetics image', async () => {

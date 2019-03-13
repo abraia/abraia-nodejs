@@ -1,6 +1,6 @@
 {
   "name": "abraia",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Abraia Node SDK",
   "scripts": {
     "test": "nyc mocha --reporter spec",
