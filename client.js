@@ -5,6 +5,12 @@ const axios = require('axios')
 
 const { API_URL } = require('./config')
 
+const createError = (err) => {
+  if (err.response)
+    return new APIError(err.response.data.message, err.response.status)
+  return new APIError('No Internet Connection')
+}
+
 class APIError extends Error {
   constructor(message, code = 0) {
     super(message)
@@ -30,7 +36,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/users`, { auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -50,7 +56,7 @@ class Client {
           }
           resolve({ files, folders })
         })
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -65,7 +71,7 @@ class Client {
         folder.path = folder.source
         folder.source = `${API_URL}/files/${folder.source}`
         resolve(folder)
-      }).catch(err => reject(new APIError(err.response.data, err.response.status)))
+      }).catch(err => reject(createError(err)))
     })
   }
 
@@ -85,7 +91,7 @@ class Client {
         } else {
           reject(resp)
         }
-      }).catch(err => reject(new APIError(err.response.data, err.response.status)))
+      }).catch(err => reject(createError(err)))
     })
   }
 
@@ -123,11 +129,11 @@ class Client {
                 reject(resp)
               }
             })
-            .catch(err => reject(new APIError(err.response.data, err.response.status)))
+            .catch(err => reject(createError(err)))
         } else {
           reject(resp)
         }
-      }).catch(err => reject(new APIError(err.response.data, err.response.status)))
+      }).catch(err => reject(createError(err)))
     })
   }
 
@@ -140,7 +146,7 @@ class Client {
           file.source = `${API_URL}/files/${file.source}`
           resolve(file)
         })
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -150,7 +156,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/files/${path}`, config)
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -158,7 +164,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.delete(`${API_URL}/files/${path}`, { auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -167,7 +173,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/images/${path}`, config)
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -175,7 +181,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/analysis/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -183,7 +189,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/aesthetics/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 
@@ -191,7 +197,7 @@ class Client {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/videos/${path}`, { params, auth: this.auth })
         .then(resp => resolve(resp.data))
-        .catch(err => reject(new APIError(err.response.data, err.response.status)))
+        .catch(err => reject(createError(err)))
     })
   }
 }

@@ -14,23 +14,23 @@ describe('Abraia', () => {
     assert(result instanceof Object)
   }).timeout(25000)
 
-  it('upload local file', async () => {
-    const result = await abraia.fromFile('images/lion.jpg')
-    assert(result.path.endsWith('lion.jpg'))
+  it('optimize local image', async () => {
+    const data = await abraia.fromFile('images/lion.jpg').toBuffer()
+    assert(Buffer.isBuffer(data))
   }).timeout(25000)
 
-  it('upload remote file', async () => {
+  it('optimize remote image', async () => {
     const url = 'https://api.abraia.me/files/demo/birds.jpg'
-    const result = await abraia.fromUrl(url)
-    assert(result.path.endsWith('birds.jpg'))
+    const data = await abraia.fromUrl(url).toBuffer()
+    assert(Buffer.isBuffer(data))
   }).timeout(25000)
 
-  it('upload unexisting file', () => {
-    abraia.fromFile('lion.jpg')
+  it('optimize unexisting file', () => {
+     abraia.fromFile('lion.jpg').toBuffer()
       .catch(err => assert(err instanceof Object))
   }).timeout(25000)
 
-  it('optimize image', async () => {
+  it('optimize and save image', async () => {
     await abraia.fromStore('lion.jpg').toFile('images/optimized.jpg')
     assert(fs.lstatSync('images/optimized.jpg').isFile())
   }).timeout(25000)
