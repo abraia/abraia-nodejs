@@ -17,7 +17,7 @@
     "abraia-api",
     "node"
   ],
-  "author": "Jorge Rodriguez Araujo",
+  "author": "Jorge Rodriguez Araujo <jorge@abraiasoftware.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/abraia/abraia-nodejs/issues"

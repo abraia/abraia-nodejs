@@ -17,11 +17,24 @@ npm install --save abraia
 ```
 
 Get your [free API key](https://abraia.me/docs/getting-started) and define the
-`ABRAIA_KEY` environment variable.
+`ABRAIA_KEY` environment variable. Configure this variable in your system or
+run one of the commands bellow every time you start a terminal/console session.
+
+If you are on Linux/Mac you need to run:
 
 ```sh
 export ABRAIA_KEY=your_api_key
 ```
+
+If you are on Windows you need to run:
+
+```sh
+set ABRAIA_KEY=your_api_key
+```
+
+You can also configure your ABRAIA_KEY in your node file, if you do not have
+any security concern, writing `process.env.ABRAIA_KEY='your_api_key'` at the
+start of the file, before the library import.
 
 ## Optimizing images
 
