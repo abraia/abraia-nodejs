@@ -32,9 +32,9 @@ If you are on Windows you need to run:
 set ABRAIA_KEY=your_api_key
 ```
 
-You can also configure your ABRAIA_KEY in your node file, if you do not have
-any security concern, writing `process.env.ABRAIA_KEY='your_api_key'` at the
-start of the file, before the library import.
+If you do not have any security concern, you can also configure your ABRAIA_KEY
+in the node file writing `process.env.ABRAIA_KEY='your_api_key'` at the start of
+the file, before the library import.
 
 ## Optimizing images
 

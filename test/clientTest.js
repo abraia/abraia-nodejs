@@ -66,14 +66,8 @@ describe('Client', () => {
   //   assert(result instanceof Object)
   // }).timeout(25000)
 
-  // it('aesthetics image', async () => {
-  //   const result = await client.aestheticsImage('0/birds.jpg')
-  //   assert(result instanceof Object)
-  //   assert(result.result === 6.076241970062256)
-  // }).timeout(25000)
-
-  it('remove file', async () => {
-    const result = await client.removeFile('0/lion.jpg')
+  it('delete file', async () => {
+    const result = await client.deleteFile('0/lion.jpg')
     assert(result instanceof Object)
     assert(result.file instanceof Object)
     assert(result.file.name === 'lion.jpg')
@@ -87,11 +81,6 @@ describe('Client', () => {
 
   it('analyze non existing image', () => {
     client.analyzeImage('0/lion.jpg')
-      .catch(err => assert(err instanceof Object))
-  }).timeout(25000)
-
-  it('aesthetics non existing image', () => {
-    client.aestheticsImage('0/lion.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(25000)
 })

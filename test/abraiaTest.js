@@ -74,8 +74,8 @@ describe('Abraia', () => {
     assert(fs.lstatSync('images/lion.bak.jpg').isFile())
   }).timeout(25000)
 
-  it('remove stored image', async () => {
-    const result = await abraia.fromStore('lion.jpg').remove()
+  it('delete stored image', async () => {
+    const result = await abraia.fromStore('lion.jpg').delete()
     assert(result.file.name === 'lion.jpg')
   }).timeout(25000)
 })

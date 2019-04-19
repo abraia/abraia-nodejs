@@ -78,7 +78,7 @@ const resize = (params, values) => {
 }
 
 const remove = (values) => {
-  return client.removeFile(values.path)
+  return client.deleteFile(values.path)
 }
 
 const Api = (previousActions = Promise.resolve()) => {
@@ -89,7 +89,7 @@ const Api = (previousActions = Promise.resolve()) => {
     fromUrl: (url) => Api(previousActions.then(() => fromUrl(url))),
     fromStore: (path) => Api(previousActions.then(() => fromStore(path))),
     resize: (params) => Api(previousActions.then(values => resize(params, values))),
-    remove: () => previousActions.then(values => remove(values)),
+    delete: () => previousActions.then(values => remove(values)),
     toBuffer: (params) => previousActions.then(values => toBuffer(params, values)),
     toFile: (filename) => previousActions.then(values => toFile(filename, values))
   }

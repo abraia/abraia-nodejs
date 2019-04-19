@@ -160,7 +160,7 @@ class Client {
     })
   }
 
-  removeFile (path) {
+  deleteFile (path) {
     return new Promise((resolve, reject) => {
       axios.delete(`${API_URL}/files/${path}`, { auth: this.auth })
         .then(resp => resolve(resp.data))
@@ -185,18 +185,27 @@ class Client {
     })
   }
 
-  aestheticsImage (path, params = {}) {
-    return new Promise((resolve, reject) => {
-      axios.get(`${API_URL}/aesthetics/${path}`, { params, auth: this.auth })
-        .then(resp => resolve(resp.data))
-        .catch(err => reject(createError(err)))
-    })
-  }
-
-  processVideo (path, params = {}) {
+  processVideo (path, params = {}, delay = 5000) {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/videos/${path}`, { params, auth: this.auth })
-        .then(resp => resolve(resp.data))
+        .then((resp) => {
+          const result = resp.data
+          const timer = setInterval(() => {
+            axios.head(`${API_URL}/files/${result.path}`, { auth: this.auth })
+              .then((resp) => {
+                console.log(resp)
+                clearInterval(timer)
+                resolve({ path: result.path })
+              })
+              .catch((err) => {
+                console.log(err)
+                if (err.response && err.response.status !== 404) {
+                  clearInterval(timer)
+                  resolve({ path: result.path })
+                }
+              })
+          }, delay)
+        })
         .catch(err => reject(createError(err)))
     })
   }
