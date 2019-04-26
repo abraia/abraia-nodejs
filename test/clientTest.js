@@ -61,11 +61,6 @@ describe('Client', () => {
     assert(data.length === 469840)
   }).timeout(25000)
 
-  // it('analyze image', async () => {
-  //   const result = await client.analyzeImage('0/lion.jpg', { m: 'fcrop', ar: 1 })
-  //   assert(result instanceof Object)
-  // }).timeout(25000)
-
   it('delete file', async () => {
     const result = await client.deleteFile('0/lion.jpg')
     assert(result instanceof Object)
@@ -73,6 +68,17 @@ describe('Client', () => {
     assert(result.file.name === 'lion.jpg')
     assert(result.file.source === '0/lion.jpg')
   }).timeout(25000)
+
+  // it('transform image', async () => {
+  //   const data = await client.transformImage('0/lion.jpg', { w: 300 })
+  //   console.log(data)
+  //   assert(data instanceof ArrayBuffer)
+  // }).timeout(25000)
+
+  // it('analyze image', async () => {
+  //   const result = await client.analyzeImage('0/lion.jpg', { m: 'fcrop', ar: 1 })
+  //   assert(result instanceof Object)
+  // }).timeout(25000)
 
   it('download non existing file', () => {
     client.downloadFile('0/lion.jpg')
