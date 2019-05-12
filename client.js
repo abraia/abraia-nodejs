@@ -185,7 +185,7 @@ class Client {
     })
   }
 
-  processVideo (path, params = {}, delay = 5000) {
+  transformVideo (path, params = {}, delay = 5000) {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/videos/${path}`, { params, auth: this.auth })
         .then((resp) => {

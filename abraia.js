@@ -1,7 +1,7 @@
 const mime = require('mime')
 const fs = require('fs')
 
-const { folder } = require('./config')
+const { folder, API_URL } = require('./config')
 const Client = require('./client')
 
 const client = new Client()
@@ -51,7 +51,7 @@ const toBuffer = (params, values) => {
   if (params && params.fmt) values.params.fmt = params.fmt
   const type = mime.getType(values.path)
   if (type && type.split('/')[0] === 'video') {
-    return client.processVideo(values.path, values.params)
+    return client.transformVideo(values.path, values.params)
   } else {
     return client.transformImage(values.path, values.params)
   }
@@ -80,6 +80,19 @@ const resize = (params, values) => {
   return Promise.resolve(values)
 }
 
+const process = (params, values) => {
+  if (params) {
+    if (params.action) {
+      const background = values.path
+      values.path = `${userid}/${params.action}`
+      values.params.background = `${API_URL}/files/${background}`
+      delete params.action
+      values.params = { ...values.params, ...params }
+    }
+  }
+  return Promise.resolve(values)
+}
+
 const remove = (values) => {
   return client.deleteFile(values.path)
 }
@@ -92,6 +105,7 @@ const Api = (previousActions = Promise.resolve()) => {
     fromUrl: (url) => Api(previousActions.then(() => fromUrl(url))),
     fromStore: (path) => Api(previousActions.then(() => fromStore(path))),
     resize: (params) => Api(previousActions.then(values => resize(params, values))),
+    process: (params) => Api(previousActions.then(values => process(params, values))),
     delete: () => previousActions.then(values => remove(values)),
     toBuffer: (params) => previousActions.then(values => toBuffer(params, values)),
     toFile: (filename) => previousActions.then(values => toFile(filename, values))

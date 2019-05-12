@@ -11,20 +11,20 @@ describe('Client', () => {
     const result = await client.loadUser()
     assert(result instanceof Object)
     assert(result.user.id === '0')
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('list files', async () => {
     const result = await client.listFiles()
     assert.typeOf(result.files, 'array')
     assert.typeOf(result.folders, 'array')
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('create folder', async () => {
     const result = await client.createFolder('0/test/')
     assert(result instanceof Object)
     assert(result.name === 'test')
     assert(result.path === '0/test/')
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('upload remote', async () => {
     const url = 'https://api.abraia.me/files/demo/birds.jpg'
@@ -32,7 +32,7 @@ describe('Client', () => {
     assert(result instanceof Object)
     assert(result.name === 'birds.jpg')
     assert(result.path === '0/birds.jpg')
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('upload file', async () => {
     const filename = path.join(__dirname, '../images/lion.jpg')
@@ -46,7 +46,7 @@ describe('Client', () => {
     assert(result instanceof Object)
     assert(result.name === 'lion.jpg')
     assert(result.path === '0/lion.jpg')
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('move file', async () => {
     await client.moveFile('0/birds.jpg', '0/test/birds.jpg')
@@ -54,12 +54,13 @@ describe('Client', () => {
     assert(result instanceof Object)
     assert(result.name === 'birds.jpg')
     assert(result.path === '0/birds.jpg')
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('download file', async () => {
     const data = await client.downloadFile('0/lion.jpg')
+    assert(Buffer.isBuffer(data))
     assert(data.length === 469840)
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('delete file', async () => {
     const result = await client.deleteFile('0/lion.jpg')
@@ -67,26 +68,25 @@ describe('Client', () => {
     assert(result.file instanceof Object)
     assert(result.file.name === 'lion.jpg')
     assert(result.file.source === '0/lion.jpg')
-  }).timeout(25000)
+  }).timeout(30000)
 
-  // it('transform image', async () => {
-  //   const data = await client.transformImage('0/lion.jpg', { w: 300 })
-  //   console.log(data)
-  //   assert(data instanceof ArrayBuffer)
-  // }).timeout(25000)
+  it('transform image', async () => {
+    const data = await client.transformImage('0/birds.jpg', { w: 300 })
+    assert(Buffer.isBuffer(data))
+  }).timeout(30000)
 
-  // it('analyze image', async () => {
-  //   const result = await client.analyzeImage('0/lion.jpg', { m: 'fcrop', ar: 1 })
-  //   assert(result instanceof Object)
-  // }).timeout(25000)
+  it('analyze image', async () => {
+    const result = await client.analyzeImage('0/birds.jpg', { ar: 1 })
+    assert(result instanceof Object)
+  }).timeout(30000)
 
   it('download non existing file', () => {
     client.downloadFile('0/lion.jpg')
       .catch(err => assert(err instanceof Object))
-  }).timeout(25000)
+  }).timeout(30000)
 
   it('analyze non existing image', () => {
     client.analyzeImage('0/lion.jpg')
       .catch(err => assert(err instanceof Object))
-  }).timeout(25000)
+  }).timeout(30000)
 })

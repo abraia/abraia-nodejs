@@ -69,6 +69,14 @@ describe('Abraia', () => {
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
 
+  it('process image', async () => {
+    const filename = 'images/tiger_brand.jpg'
+    await abraia.fromStore('tiger.jpg')
+      .process({ action: 'test.atn' })
+      .toFile(filename)
+    assert(fs.lstatSync(filename).isFile())
+  }).timeout(25000)
+
   it('restore stored image', async () => {
     await abraia.fromStore('lion.jpg').toFile('images/lion.bak.jpg')
     assert(fs.lstatSync('images/lion.bak.jpg').isFile())
