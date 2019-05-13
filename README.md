@@ -1,7 +1,6 @@
-[![npm version](https://badge.fury.io/js/abraia.svg)](https://www.npmjs.com/package/abraia)
-[![Build Status](https://travis-ci.org/abraia/abraia-nodejs.svg)](https://travis-ci.org/abraia/abraia-nodejs)
-[![Coverage Status](https://coveralls.io/repos/github/abraia/abraia-nodejs/badge.svg)](https://coveralls.io/github/abraia/abraia-nodejs)
-![npm vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/abraia.svg)
+[![Npm Version](https://img.shields.io/npm/v/abraia.svg?style=flat-square)](https://www.npmjs.com/package/abraia)
+[![Build Status](https://img.shields.io/travis/abraia/abraia-nodejs.svg?style=flat-square)](https://travis-ci.org/abraia/abraia-nodejs)
+[![Coverage Status](https://img.shields.io/coveralls/github/abraia/abraia-nodejs.svg?style=flat-square)](https://coveralls.io/github/abraia/abraia-nodejs)
 
 # Abraia API client for Node.js
 
