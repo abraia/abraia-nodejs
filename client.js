@@ -151,7 +151,7 @@ class Client {
   }
 
   downloadFile (path, callback = undefined) {
-    const config = { responseType: 'arraybuffer', auth: this.auth }
+    const config = { responseType: 'arraybuffer' }
     if (callback instanceof Function) config.onDownloadProgress = callback
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/files/${path}`, config)
