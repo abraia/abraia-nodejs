@@ -85,7 +85,7 @@ const process = (params, values) => {
     if (params.action) {
       const background = values.path
       values.path = `${userid}/${params.action}`
-      values.params.background = `${API_URL}/files/${background}`
+      if (!values.params.background) values.params.background = `${API_URL}/files/${background}`
       delete params.action
       values.params = { ...values.params, ...params }
     }
