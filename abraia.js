@@ -82,10 +82,10 @@ const resize = (params, values) => {
 
 const process = (params, values) => {
   if (params) {
-    if (params.action) {
+    if (params.action && !values.path.endsWith('atn')) {
       const background = values.path
       values.path = `${userid}/${params.action}`
-      if (!values.params.background) values.params.background = `${API_URL}/files/${background}`
+      if (!values.params.background) values.params.background = `${API_URL}/images/${background}`
       delete params.action
       values.params = { ...values.params, ...params }
     }

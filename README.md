@@ -5,7 +5,9 @@
 # Abraia API client for Node.js
 
 Node.js client for [Abraia](https://abraia.me) services. It is used to smartly
-[optimize images for web](https://abraia.me/docs/image-optimization).
+[optimize images for web](https://abraia.me/docs/image-optimization). Every
+image is analyzed to choose the best image compression parameters for ecommerce
+and web optimization (best image quality with the minimal files size).
 
 ## Installation
 
@@ -15,30 +17,21 @@ Install the API client:
 npm install --save abraia
 ```
 
-Get your [free API key](https://abraia.me/docs/getting-started) and define the
-`ABRAIA_KEY` environment variable. Configure this variable in your system or
-run one of the commands bellow every time you start a terminal/console session.
-
-If you are on Linux/Mac you need to run:
+Get your [free API key](https://abraia.me/docs/getting-started) and set the
+`ABRAIA_KEY` environment variable every time you start a terminal/console
+session. On Windows, use `set` instead of `export`.
 
 ```sh
 export ABRAIA_KEY=your_api_key
 ```
 
-If you are on Windows you need to run:
-
-```sh
-set ABRAIA_KEY=your_api_key
-```
-
-If you do not have any security concern, you can also configure your ABRAIA_KEY
-in the node file writing `process.env.ABRAIA_KEY='your_api_key'` at the start of
-the file, before the library import.
+For a persistent configuration use your system options to set your `ABRAIA_KEY`.
 
 ## Optimizing images
 
-Optimizing images can be directly performed using the fluent API, not knowing
-anything about web image formats and parameters.
+Using the fluent API, to optimize your images you just need to specify the input
+and output file name, and the image will be smartly optimized for a web best
+performance.
 
 ```js
 const abraia = require('abraia/abraia')
@@ -46,8 +39,8 @@ const abraia = require('abraia/abraia')
 abraia.fromFile('images/lion.jpg').toFile('images/optimized.jpg')
 ```
 
-This significantly reduces the JPEG image file size from 470kB to 264kB
-using our content-aware compression algorithm.
+For instance, the previous code significantly reduces the JPEG image file size
+from 470kB to 264kB using our content-aware compression algorithm.
 
 You can also optimize PNG, GIF and WebP images, or convert them from one format
 to another just changing the file name extension.
@@ -61,13 +54,14 @@ abraia.fromFile('images/jaguar.png').toFile('images/jaguar.jpg')
 ![PNG8 jaguar](https://github.com/abraia/abraia-nodejs/raw/master/images/jaguar8.png)
 ![JPEG jaguar](https://github.com/abraia/abraia-nodejs/raw/master/images/jaguar.jpg)
 
-This automatically optimize the PNG image from 45KB to 15.8KB or convert it to
+This automatically optimizes the PNG image from 45KB to 15.8KB or convert it to
 JPEG (14.1KB) with a white background replacing the transparent one.
 
-## Resizing images
+## Resizing and cropping images
 
-By default, you can automatically resize and crop your images just specifying
-the demanded image size.
+Moreover, Abraia services implement high quality resize and [smart cropping](
+https://abraia.me/docs/smart-cropping) options. You can automatically resize and
+crop your images just specifying the demanded image size.
 
 ```js
 abraia.fromFile('images/tiger.jpg')
@@ -80,7 +74,8 @@ abraia.fromFile('images/tiger.jpg')
 
 *Tiger image smart cropped to a square of 333x333 pixels*
 
-Or just resize them specifying the width or the height of the image.
+For a typical image resizing you just need to specify the width or the height of
+the final image.
 
 ```js
 abraia.fromFile('images/tiger.jpg')
