@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const assert = require('chai').assert
 const fs = require('fs')
 
