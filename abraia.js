@@ -1,8 +1,7 @@
-const mime = require('mime')
-const fs = require('fs')
-
 const { folder, API_URL } = require('./config')
 const Client = require('./client')
+const mime = require('mime')
+const fs = require('fs')
 
 const client = new Client()
 let userid
@@ -29,10 +28,9 @@ const files = async (path = '') => {
 const fromFile = async (file) => {
   if (!userid) userid = await userId()
   const name = (file.path) ? file.path.split('/').pop() : file.split('/').pop()
-  const type = mime.getType(name)
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
   const stream = (file.contents) ? file.contents : fs.createReadStream(file)
-  return client.uploadFile({ name, type, size, stream }, `${userid}/${folder}${name}`)
+  return client.uploadFile({ name, size, stream }, `${userid}/${folder}${name}`)
     .then(resp => Promise.resolve({ path: resp.path, params: { q: 'auto' } }))
 }
 

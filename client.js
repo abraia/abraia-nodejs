@@ -2,6 +2,7 @@
 const followRedirects = require('follow-redirects')
 followRedirects.maxBodyLength = 100 * 1024 * 1024; // 100 MB
 const axios = require('axios')
+const mime = require('mime')
 
 const { API_URL } = require('./config')
 
@@ -40,11 +41,13 @@ class Client {
     })
   }
 
-  listFiles (path = '') {
+  listFiles(path = '') {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/files/${path}`, { auth: this.auth })
         .then(resp => {
-          const { files, folders } = resp.data
+          let { files, folders } = resp.data
+          files = files.filter(file => !file.name.startsWith('.'))
+          folders = folders.filter(folder => !folder.name.startsWith('.'))
           for (const i in folders) {
             folders[i].path = folders[i].source
             folders[i].source = `${API_URL}/files/${folders[i].source}`
@@ -53,6 +56,8 @@ class Client {
             files[i].path = files[i].source
             files[i].source = `${API_URL}/images/${files[i].source}`
             files[i].thumbnail = `${API_URL}/files/${files[i].thumbnail}`
+            if (files[i].name.endsWith('m3u8')) files[i].type = 'application/x-mpegURL'
+            else files[i].type = mime.getType(files[i].name)
           }
           resolve({ files, folders })
         })
@@ -98,7 +103,7 @@ class Client {
   uploadFile (file, path = '', callback = undefined) {
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()
-    const type = (file.type) ? file.type : 'binary/octet-stream'
+    const type = mime.getType(name) || 'binary/octet-stream'
     return new Promise((resolve, reject) => {
       axios({
         method: 'post',
