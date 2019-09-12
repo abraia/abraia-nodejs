@@ -174,6 +174,11 @@ class Client {
   }
 
   transformImage (path, params = {}) {
+    if (params.action) {
+      params.background = `${API_URL}/images/${path}`;
+      if (!params.fmt) params.fmt = params.background.split('.').pop();
+      path = `${path.split('/')[0]}/${params.action}`;
+    }
     const config = { params, responseType: 'arraybuffer', auth: this.auth }
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/images/${path}`, config)
