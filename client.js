@@ -1,15 +1,16 @@
 // Setting Global follow-redirects maxBodyLength
 const followRedirects = require('follow-redirects')
-followRedirects.maxBodyLength = 100 * 1024 * 1024; // 100 MB
+followRedirects.maxBodyLength = 100 * 1024 * 1024  // 100 MB
 const axios = require('axios')
 const mime = require('mime')
 
-const { API_URL } = require('./config')
+const API_URL = 'https://api.abraia.me'
 
-const createError = (err) => {
-  if (err.response)
-    return new APIError(err.response.data.message, err.response.status)
-  return new APIError('No Internet Connection')
+const sizeFormat = (bytes = 0) => {
+  if (bytes === 0) return '0 B'
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
 }
 
 class APIError extends Error {
@@ -17,6 +18,12 @@ class APIError extends Error {
     super(message)
     this.code = code
   }
+}
+
+const createError = (err) => {
+  if (err.response)
+    return new APIError(err.response.data.message, err.response.status)
+  return new APIError('No Internet Connection')
 }
 
 class Client {
@@ -41,7 +48,7 @@ class Client {
     })
   }
 
-  listFiles(path = '') {
+  listFiles (path = '') {
     return new Promise((resolve, reject) => {
       axios.get(`${API_URL}/files/${path}`, { auth: this.auth })
         .then(resp => {
@@ -91,6 +98,7 @@ class Client {
         if (resp.status === 201) {
           const file = resp.data.file
           file.path = file.source
+          file.type = mime.getType(file.name),
           file.source = `${API_URL}/files/${file.source}`
           resolve(file)
         } else {
@@ -127,6 +135,7 @@ class Client {
                 resolve({
                   name: name,
                   path: source,
+                  type: mime.getType(name),
                   source: `${API_URL}/files/${source}`,
                   thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
                 })
@@ -175,9 +184,9 @@ class Client {
 
   transformImage (path, params = {}) {
     if (params.action) {
-      params.background = `${API_URL}/images/${path}`;
-      if (!params.fmt) params.fmt = params.background.split('.').pop();
-      path = `${path.split('/')[0]}/${params.action}`;
+      params.background = `${API_URL}/images/${path}`
+      if (!params.fmt) params.fmt = params.background.split('.').pop()
+      path = `${path.split('/')[0]}/${params.action}`
     }
     const config = { params, responseType: 'arraybuffer', auth: this.auth }
     return new Promise((resolve, reject) => {
@@ -203,12 +212,10 @@ class Client {
           const timer = setInterval(() => {
             axios.head(`${API_URL}/files/${result.path}`, { auth: this.auth })
               .then((resp) => {
-                console.log(resp)
                 clearInterval(timer)
                 resolve({ path: result.path })
               })
               .catch((err) => {
-                console.log(err)
                 if (err.response && err.response.status !== 404) {
                   clearInterval(timer)
                   resolve({ path: result.path })

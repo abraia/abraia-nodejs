@@ -16,7 +16,7 @@ describe('Client', () => {
   }).timeout(30000)
 
   it('list files', async () => {
-    const result = await client.listFiles()
+    const result = await client.listFiles('0/')
     assert.typeOf(result.files, 'array')
     assert.typeOf(result.folders, 'array')
   }).timeout(30000)

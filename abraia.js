@@ -1,4 +1,4 @@
-const { folder, API_URL } = require('./config')
+const { folder } = require('./config')
 const Client = require('./client')
 const mime = require('mime')
 const fs = require('fs')
@@ -45,11 +45,12 @@ const fromStore = async (path) => {
   return Promise.resolve({ path: `${userid}/${path}`, params: {} })
 }
 
-const toBuffer = (params, values) => {
+const toBuffer = async (params, values) => {
   if (params && params.fmt) values.params.fmt = params.fmt
   const type = mime.getType(values.path)
-  if (type && type.split('/')[0] === 'video') {
-    return client.transformVideo(values.path, values.params)
+  if (type && type.startsWith('video')) {
+    const result = await client.transformVideo(values.path, values.params)
+    return client.downloadFile(result.path)
   } else {
     return client.transformImage(values.path, values.params)
   }
@@ -79,15 +80,7 @@ const resize = (params, values) => {
 }
 
 const process = (params, values) => {
-  if (params) {
-    if (params.action && !values.path.endsWith('atn')) {
-      const background = values.path
-      values.path = `${userid}/${params.action}`
-      if (!values.params.background) values.params.background = `${API_URL}/images/${background}`
-      delete params.action
-      values.params = { ...values.params, ...params }
-    }
-  }
+  if (params) values.params = { ...values.params, ...params }
   return Promise.resolve(values)
 }
 
