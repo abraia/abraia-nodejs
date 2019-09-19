@@ -23,7 +23,9 @@ class APIError extends Error {
 const createError = (err) => {
   if (err.response)
     return new APIError(err.response.data.message, err.response.status)
-  return new APIError('No Internet Connection')
+  if (err.code === 'ENOTFOUND')
+    return new APIError('No Internet Connection')
+  return new APIError(err.message)
 }
 
 class Client {
