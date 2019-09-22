@@ -226,7 +226,7 @@ module.exports.Client = class Client {
       return await new Promise(resolve => {
         const timer = setInterval(() => {
           axios.head(`${API_URL}/files/${result.path}`, { auth: this.auth })
-            .then((resp) => {
+            .then(() => {
               clearInterval(timer)
               resolve({ path: result.path })
             })

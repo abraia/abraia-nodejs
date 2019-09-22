@@ -24,28 +24,28 @@ describe('client class', () => {
   it('load user', async () => {
     const result = await client.loadUser()
     assert(result instanceof Object)
-    assert(result.user.id === '0')
+    assert(result.user.id === 'demo')
   }).timeout(30000)
 
   it('list files', async () => {
-    const result = await client.listFiles('0/')
+    const result = await client.listFiles('demo/')
     assert.typeOf(result.files, 'array')
     assert.typeOf(result.folders, 'array')
   }).timeout(30000)
 
   it('create folder', async () => {
-    const result = await client.createFolder('0/test/')
+    const result = await client.createFolder('demo/test/')
     assert(result instanceof Object)
     assert(result.name === 'test')
-    assert(result.path === '0/test/')
+    assert(result.path === 'demo/test/')
   }).timeout(30000)
 
   it('upload remote', async () => {
-    const url = 'https://api.abraia.me/files/demo/birds.jpg'
-    const result = await client.uploadRemote(url, '0/')
+    const url = 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Adler.jpg'
+    const result = await client.uploadRemote(url, 'demo/')
     assert(result instanceof Object)
-    assert(result.name === 'birds.jpg')
-    assert(result.path === '0/birds.jpg')
+    assert(result.name === 'Adler.jpg')
+    assert(result.path === 'demo/Adler.jpg')
   }).timeout(30000)
 
   it('upload file', async () => {
@@ -56,51 +56,56 @@ describe('client class', () => {
       size: fs.statSync(filename)['size'],
       stream: fs.createReadStream(filename)
     }
-    const result = await client.uploadFile(file, '0/lion.jpg')
+    const result = await client.uploadFile(file, 'demo/lion.jpg')
     assert(result instanceof Object)
     assert(result.name === 'lion.jpg')
-    assert(result.path === '0/lion.jpg')
+    assert(result.path === 'demo/lion.jpg')
   }).timeout(30000)
 
   it('move file', async () => {
-    await client.moveFile('0/birds.jpg', '0/test/birds.jpg')
-    const result = await client.moveFile('0/test/birds.jpg', '0/birds.jpg')
+    await client.moveFile('demo/Adler.jpg', 'demo/test/Adler.jpg')
+    const result = await client.moveFile('demo/test/Adler.jpg', 'demo/Adler.jpg')
     assert(result instanceof Object)
-    assert(result.name === 'birds.jpg')
-    assert(result.path === '0/birds.jpg')
+    assert(result.name === 'Adler.jpg')
+    assert(result.path === 'demo/Adler.jpg')
   }).timeout(30000)
 
   it('download file', async () => {
-    const data = await client.downloadFile('0/lion.jpg')
+    const data = await client.downloadFile('demo/lion.jpg')
     assert(Buffer.isBuffer(data))
     assert(data.length === 469840)
   }).timeout(30000)
 
   it('delete file', async () => {
-    const result = await client.deleteFile('0/birds.jpg')
+    const result = await client.deleteFile('demo/Adler.jpg')
     assert(result instanceof Object)
     assert(result.file instanceof Object)
-    assert(result.file.name === 'birds.jpg')
-    assert(result.file.source === '0/birds.jpg')
+    assert(result.file.name === 'Adler.jpg')
+    assert(result.file.source === 'demo/Adler.jpg')
   }).timeout(30000)
 
   it('transform image', async () => {
-    const data = await client.transformImage('0/lion.jpg', { w: 300 })
+    const data = await client.transformImage('demo/lion.jpg', { w: 300 })
     assert(Buffer.isBuffer(data))
   }).timeout(30000)
 
   it('analyze image', async () => {
-    const result = await client.analyzeImage('0/lion.jpg', { ar: 1 })
+    const result = await client.analyzeImage('demo/lion.jpg', { ar: 1 })
     assert(result instanceof Object)
   }).timeout(30000)
 
+  it('transform video', async () => {
+    const result = await client.transformVideo('demo/videos/bigbuckbunny.mp4', { fmt: 'jpg' })
+    assert(result.path === 'demo/videos/bigbuckbunny.jpg')
+  }).timeout(30000)
+
   it('download non existing file', () => {
-    client.downloadFile('0/birds.jpg')
+    client.downloadFile('demo/Adler.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(30000)
 
   it('analyze non existing image', () => {
-    client.analyzeImage('0/birds.jpg')
+    client.analyzeImage('demo/Adler.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(30000)
 })

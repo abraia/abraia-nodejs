@@ -22,7 +22,7 @@ describe('Abraia', () => {
   }).timeout(25000)
 
   it('optimize remote image', async () => {
-    const url = 'https://api.abraia.me/files/demo/birds.jpg'
+    const url = 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Adler.jpg'
     const data = await abraia.fromUrl(url).toBuffer()
     assert(Buffer.isBuffer(data))
   }).timeout(25000)
