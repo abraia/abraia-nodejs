@@ -21,6 +21,16 @@ const createError = (err) => {
   return new APIError(err.message)
 }
 
+const dataFile = (name, source, size) => {
+  return {
+    name, size,
+    path: source,
+    type: mime.getType(name),
+    source: `${API_URL}/files/${source}`,
+    thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
+  }
+}
+
 module.exports.parseOutput = (output, params) => {
   String.prototype.interpolate = function (params) {
     const names = Object.keys(params)
@@ -52,147 +62,107 @@ module.exports.Client = class Client {
     this.auth = { username: apiKey, password: apiSecret }
   }
 
-  async loadUser() {
+  async getApi(url, params = {}, config = {}) {
     try {
-      const resp = await axios.get(`${API_URL}/users`, { auth: this.auth })
+      const resp = await axios.get(url, { params, ...config, auth: this.auth })
       return resp.data
     } catch (err) {
       throw createError(err)
-    } 
+    }
+  }
+
+  async postApi(url, data) {
+    try {
+      const resp = await axios({ method: 'post', url, data, auth: this.auth })
+      return resp.data
+    } catch (err) {
+      throw createError(err)
+    }
+  }
+
+  async deleleApi(url) {
+    try {
+      const resp = await axios.delete(url, { auth: this.auth })
+      return resp.data
+    } catch (err) {
+      throw createError(err)
+    }
+  }
+
+  async loadUser() {
+    return await this.getApi(`${API_URL}/users`)
   }
 
   async listFiles(path = '') {
-    try {
-      const resp = await axios.get(`${API_URL}/files/${path}`, { auth: this.auth })
-      let { files, folders } = resp.data
-      files = files.filter(file => !file.name.startsWith('.'))
-      folders = folders.filter(folder => !folder.name.startsWith('.'))
-      for (const i in folders) {
-        folders[i].path = folders[i].source
-        folders[i].source = `${API_URL}/files/${folders[i].source}`
-      }
-      for (const i in files) {
-        files[i].path = files[i].source
-        files[i].source = `${API_URL}/images/${files[i].source}`
-        files[i].thumbnail = `${API_URL}/files/${files[i].thumbnail}`
-        if (files[i].name.endsWith('m3u8')) files[i].type = 'application/x-mpegURL'
-        else files[i].type = mime.getType(files[i].name)
-      }
-      return { files, folders }
-    } catch (err) {
-      throw createError(err)
+    let { files, folders } = await this.getApi(`${API_URL}/files/${path}`)
+    files = files.filter(file => !file.name.startsWith('.'))
+    folders = folders.filter(folder => !folder.name.startsWith('.'))
+    for (const i in folders) {
+      folders[i].path = folders[i].source
+      folders[i].source = `${API_URL}/files/${folders[i].source}`
     }
+    for (const i in files) {
+      files[i].path = files[i].source
+      files[i].source = `${API_URL}/images/${files[i].source}`
+      files[i].thumbnail = `${API_URL}/files/${files[i].thumbnail}`
+      if (files[i].name.endsWith('m3u8')) files[i].type = 'application/x-mpegURL'
+      else files[i].type = mime.getType(files[i].name)
+    }
+    return { files, folders }
   }
 
   async createFolder(path) {
-    try {
-      const resp = await axios({ method: 'post', url: `${API_URL}/files/${path}`, auth: this.auth })
-      const folder = resp.data.folder
-      folder.path = folder.source
-      folder.source = `${API_URL}/files/${folder.source}`
-      return folder
-    } catch (err) {
-      throw createError(err)
-    }
+    const { folder } = await this.postApi(`${API_URL}/files/${path}`)
+    folder.path = folder.source
+    folder.source = `${API_URL}/files/${folder.source}`
+    return folder
   }
 
   async uploadRemote(url, path) {
-    try {
-      const resp = await axios({ method: 'post', url: `${API_URL}/files/${path}`, data: { url }, auth: this.auth })
-      if (resp.status === 201) {
-        const file = resp.data.file
-        file.path = file.source
-        file.type = mime.getType(file.name),
-        file.source = `${API_URL}/files/${file.source}`
-        return file
-      }
-      throw createError(resp)
-    } catch (err) {
-      throw createError(err)
-    }
+    const { file } = await this.postApi(`${API_URL}/files/${path}`, { url })
+    const { name, source, size } = file
+    return dataFile(name, source, size)
   }
 
   async uploadFile(file, path = '', callback = undefined) {
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()
     const type = mime.getType(name) || 'binary/octet-stream'
-    try {
-      const resp = await axios({
-        method: 'post',
-        url: `${API_URL}/files/${path}`,
-        data: (file.md5) ? { name, type, md5: file.md5 } : { name, type },
-        auth: this.auth
-      })
-      if (resp.status === 201) {
-        if (resp.data.uploadURL) {
-          const config = { method: 'put', url: resp.data.uploadURL }
-          if (typeof Blob !== 'undefined' && file instanceof Blob) {
-            config.data = file
-            config.headers = { 'Content-Type': type }
-          } else {
-            config.data = file.stream
-            config.headers = { 'Content-Type': type, 'Content-Length': file.size }
-          }
-          if (callback instanceof Function) config.onUploadProgress = callback
-          const res = await axios(config)
-          if (res.status === 200) {
-            return {
-              name: name,
-              path: source,
-              size: file.size,
-              type: mime.getType(name),
-              source: `${API_URL}/files/${source}`,
-              thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
-            }
-          }
-        } else {
-          const f = resp.data.file
-          return {
-            name: f.name,
-            path: f.source,
-            size: f.size,
-            type: mime.getType(f.name),
-            source: `${API_URL}/files/${f.source}`,
-            thumbnail: `${API_URL}/files/${f.thumbnail}`
-          }
-        }
+    const data = (file.md5) ? { name, type, md5: file.md5 } : { name, type }
+    const result = await this.postApi(`${API_URL}/files/${path}`, data)
+    if (result.uploadURL) {
+      const config = { method: 'put', url: result.uploadURL }
+      if (typeof Blob !== 'undefined' && file instanceof Blob) {
+        config.data = file
+        config.headers = { 'Content-Type': type }
+      } else {
+        config.data = file.stream
+        config.headers = { 'Content-Type': type, 'Content-Length': file.size }
       }
-      throw createError(resp)
-    } catch (err) {
-      throw createError(err)
+      if (callback instanceof Function) config.onUploadProgress = callback
+      const res = await axios(config)
+      if (res.status === 200) {
+        return dataFile(name, source, file.size)
+      }
     }
+    return dataFile(result.file.name, result.file.source, result.file.size)
   }
 
   async moveFile(oldPath, newPath) {
-    try {
-      const resp = await axios.post(`${API_URL}/files/${newPath}`, { store: oldPath }, { auth: this.auth })
-      const file = resp.data.file
-      file.path = file.source
-      file.source = `${API_URL}/files/${file.source}`
-      return file
-    } catch (err) {
-      throw createError(err)
-    }
+    const { file } = await this.postApi(`${API_URL}/files/${newPath}`, { store: oldPath })
+    file.path = file.source
+    file.source = `${API_URL}/files/${file.source}`
+    return file
   }
 
   async downloadFile(path, callback = undefined) {
     const config = { responseType: 'arraybuffer' }
     if (callback instanceof Function) config.onDownloadProgress = callback
-    try {
-      const resp = await axios.get(`${API_URL}/files/${path}`, config)
-      return resp.data
-    } catch (err) {
-      throw createError(err)
-    }
+    return await this.getApi(`${API_URL}/files/${path}`, undefined, config)
   }
 
   async deleteFile(path) {
-    try {
-      const resp = await axios.delete(`${API_URL}/files/${path}`, { auth: this.auth })
-      return resp.data
-    } catch (err) {
-      throw createError(err)
-    }
+    return await this.deleleApi(`${API_URL}/files/${path}`)
   }
 
   async transformImage(path, params = {}) {
@@ -201,45 +171,30 @@ module.exports.Client = class Client {
       if (!params.fmt) params.fmt = params.background.split('.').pop()
       path = `${path.split('/')[0]}/${params.action}`
     }
-    const config = { params, responseType: 'arraybuffer', auth: this.auth }
-    try {
-      const resp = await axios.get(`${API_URL}/images/${path}`, config)
-      return resp.data
-    } catch (err) {
-      throw createError(err)
-    }
+    const config = { responseType: 'arraybuffer' }
+    return await this.getApi(`${API_URL}/images/${path}`, params, config)
   }
 
   async analyzeImage(path, params = {}) {
-    try {
-      const resp = await axios.get(`${API_URL}/analysis/${path}`, { params, auth: this.auth })
-      return resp.data
-    } catch (err) {
-      throw createError(err)
-    }
+    return await this.getApi(`${API_URL}/analysis/${path}`, params)
   }
 
   async transformVideo(path, params = {}, delay = 5000) {
-    try {
-      const resp = await axios.get(`${API_URL}/videos/${path}`, { params, auth: this.auth })
-      const result = resp.data
-      return await new Promise(resolve => {
-        const timer = setInterval(() => {
-          axios.head(`${API_URL}/files/${result.path}`, { auth: this.auth })
-            .then(() => {
+    const result = await this.getApi(`${API_URL}/videos/${path}`, params)
+    return await new Promise(resolve => {
+      const timer = setInterval(() => {
+        axios.head(`${API_URL}/files/${result.path}`, { auth: this.auth })
+          .then(() => {
+            clearInterval(timer)
+            resolve({ path: result.path })
+          })
+          .catch((err) => {
+            if (err.response && err.response.status !== 404) {
               clearInterval(timer)
               resolve({ path: result.path })
-            })
-            .catch((err) => {
-              if (err.response && err.response.status !== 404) {
-                clearInterval(timer)
-                resolve({ path: result.path })
-              }
-            })
-        }, delay)
-      })
-    } catch (err) {
-      throw createError(err)
-    }
+            }
+          })
+      }, delay)
+    })
   }
 }
