@@ -1,6 +1,6 @@
 {
   "name": "abraia",
-  "version": "0.5.12",
+  "version": "0.6.0",
   "description": "Abraia Node SDK",
   "scripts": {
     "test": "nyc mocha --reporter spec",
@@ -11,6 +11,7 @@
     "url": "git+https://github.com/abraia/abraia-nodejs.git"
   },
   "keywords": [
+    "video-optimization",
     "image-optimization",
     "image-compression",
     "image-processing",

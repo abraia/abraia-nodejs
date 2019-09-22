@@ -158,7 +158,9 @@ module.exports.Client = class Client {
   async downloadFile(path, callback = undefined) {
     const config = { responseType: 'arraybuffer' }
     if (callback instanceof Function) config.onDownloadProgress = callback
-    return await this.getApi(`${API_URL}/files/${path}`, undefined, config)
+    // return await this.getApi(`${API_URL}/files/${path}`, undefined, config)
+    const resp = await axios.get(`${API_URL}/files/${path}`, config)
+    return resp.data
   }
 
   async deleteFile(path) {
