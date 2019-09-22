@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const assert = require('chai').assert
 
-const Client = require('../client')
+const { Client } = require('../client')
 
 const client = new Client()
 
@@ -65,30 +65,30 @@ describe('Client', () => {
   }).timeout(30000)
 
   it('delete file', async () => {
-    const result = await client.deleteFile('0/lion.jpg')
+    const result = await client.deleteFile('0/birds.jpg')
     assert(result instanceof Object)
     assert(result.file instanceof Object)
-    assert(result.file.name === 'lion.jpg')
-    assert(result.file.source === '0/lion.jpg')
+    assert(result.file.name === 'birds.jpg')
+    assert(result.file.source === '0/birds.jpg')
   }).timeout(30000)
 
   it('transform image', async () => {
-    const data = await client.transformImage('0/birds.jpg', { w: 300 })
+    const data = await client.transformImage('0/lion.jpg', { w: 300 })
     assert(Buffer.isBuffer(data))
   }).timeout(30000)
 
   it('analyze image', async () => {
-    const result = await client.analyzeImage('0/birds.jpg', { ar: 1 })
+    const result = await client.analyzeImage('0/lion.jpg', { ar: 1 })
     assert(result instanceof Object)
   }).timeout(30000)
 
   it('download non existing file', () => {
-    client.downloadFile('0/lion.jpg')
+    client.downloadFile('0/birds.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(30000)
 
   it('analyze non existing image', () => {
-    client.analyzeImage('0/lion.jpg')
+    client.analyzeImage('0/birds.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(30000)
 })

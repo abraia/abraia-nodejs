@@ -1,5 +1,6 @@
 const { folder } = require('./config')
-const Client = require('./client')
+const { Client } = require('./client')
+const md5File = require('md5-file')
 const mime = require('mime')
 const fs = require('fs')
 
@@ -27,10 +28,11 @@ const files = async (path = '') => {
 
 const fromFile = async (file) => {
   if (!userid) userid = await userId()
+  const md5 = (file.path) ? md5File.sync(file.path) : md5File.sync(file)
   const name = (file.path) ? file.path.split('/').pop() : file.split('/').pop()
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
   const stream = (file.contents) ? file.contents : fs.createReadStream(file)
-  return client.uploadFile({ name, size, stream }, `${userid}/${folder}${name}`)
+  return client.uploadFile({ name, size, md5, stream }, `${userid}/${folder}${name}`)
     .then(resp => Promise.resolve({ path: resp.path, params: { q: 'auto' } }))
 }
 
