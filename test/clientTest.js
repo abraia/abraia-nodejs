@@ -4,11 +4,23 @@ const fs = require('fs')
 const path = require('path')
 const assert = require('chai').assert
 
-const { Client } = require('../client')
+const { parseOutput, sizeFormat, Client } = require('../client')
+
+describe('client utils', () => {
+  it('parse output', () => {
+    const output = parseOutput('{name}.{ext}', { name: 'test', ext: 'jpg' })
+    assert(output === 'test.jpg')
+  })
+  
+  it('size format', () => {
+    const size = sizeFormat(127806)
+    assert(size === '124.81 KB')
+  })
+})
 
 const client = new Client()
 
-describe('Client', () => {
+describe('client class', () => {
   it('load user', async () => {
     const result = await client.loadUser()
     assert(result instanceof Object)
