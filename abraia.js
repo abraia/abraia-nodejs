@@ -48,7 +48,7 @@ const fromStore = async (path) => {
 }
 
 const toBuffer = async (params, values) => {
-  if (params && params.fmt) values.params.fmt = params.fmt
+  if (params && params.fmt && !values.params.fmt) values.params.fmt = params.fmt
   const type = mime.getType(values.path)
   if (type && type.startsWith('video')) {
     const result = await client.transformVideo(values.path, values.params)
@@ -59,7 +59,7 @@ const toBuffer = async (params, values) => {
 }
 
 const toFile = (path, values) => {
-  if (Object.keys(values.params).length && path.split('.').length) {
+  if (Object.keys(values.params).length && !values.params.fmt && path.split('.').length) {
     values.params.fmt = path.split('.').pop().toLowerCase()
   }
   return client.transformImage(values.path, values.params)
