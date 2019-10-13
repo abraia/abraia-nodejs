@@ -141,11 +141,11 @@ module.exports.Client = class Client {
       }
       if (callback instanceof Function) config.onUploadProgress = callback
       const res = await axios(config)
-      if (res.status === 200) {
-        return dataFile(name, source, file.size)
-      }
+      if (res.status === 200) return dataFile(name, source, file.size)
+    } else {
+      if (callback instanceof Function) callback({ loaded: result.file.size })
+      return dataFile(result.file.name, result.file.source, result.file.size)
     }
-    return dataFile(result.file.name, result.file.source, result.file.size)
   }
 
   async moveFile(oldPath, newPath) {
