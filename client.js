@@ -71,9 +71,9 @@ module.exports.Client = class Client {
     }
   }
 
-  async postApi(url, data) {
+  async postApi(url, data, params = {}) {
     try {
-      const resp = await axios({ method: 'post', url, data, auth: this.auth })
+      const resp = await axios({ method: 'post', url, data, params, auth: this.auth })
       return resp.data
     } catch (err) {
       throw createError(err)
@@ -85,6 +85,17 @@ module.exports.Client = class Client {
       const resp = await axios.delete(url, { auth: this.auth })
       return resp.data
     } catch (err) {
+      throw createError(err)
+    }
+  }
+
+  async headApi(url) {
+    try {
+      await axios.head(url, { auth: this.auth })
+      return true
+    } catch (err) {
+      if (err.response && err.response.status === 404) return false
+      if (err.response && err.response.status === 403) return true
       throw createError(err)
     }
   }
@@ -124,21 +135,21 @@ module.exports.Client = class Client {
     return dataFile(name, source, size)
   }
 
-  async uploadFile(file, path = '', callback = undefined) {
+  async uploadFile(file, path = '', callback = undefined, params = {}) {
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()
     const type = mime.getType(name) || 'binary/octet-stream'
     const data = (file.md5) ? { name, type, md5: file.md5 } : { name, type }
-    const result = await this.postApi(`${API_URL}/files/${path}`, data)
+    const result = await this.postApi(`${API_URL}/files/${path}`, data, params)
     if (result.uploadURL) {
-      const config = { method: 'put', url: result.uploadURL }
+      const config = { method: 'put', url: result.uploadURL, headers: { 'Content-Type': type } }
       if (typeof Blob !== 'undefined' && file instanceof Blob) {
         config.data = file
-        config.headers = { 'Content-Type': type }
       } else {
         config.data = file.stream
-        config.headers = { 'Content-Type': type, 'Content-Length': file.size }
+        config.headers['Content-Length'] = file.size
       }
+      if (params.public) config.headers['x-amz-acl'] = 'public-read'
       if (callback instanceof Function) config.onUploadProgress = callback
       const res = await axios(config)
       if (res.status === 200) return dataFile(name, source, file.size)
@@ -167,6 +178,10 @@ module.exports.Client = class Client {
     return await this.deleleApi(`${API_URL}/files/${path}`)
   }
 
+  async checkFile(path) {
+    return await this.headApi(`${API_URL}/files/${path}`)
+  }
+
   async transformImage(path, params = {}) {
     if (params.action) {
       params.background = `${API_URL}/images/${path}`
@@ -184,18 +199,12 @@ module.exports.Client = class Client {
   async transformVideo(path, params = {}, delay = 5000) {
     const result = await this.getApi(`${API_URL}/videos/${path}`, params)
     return await new Promise(resolve => {
-      const timer = setInterval(() => {
-        axios.head(`${API_URL}/files/${result.path}`, { auth: this.auth })
-          .then(() => {
-            clearInterval(timer)
-            resolve({ path: result.path })
-          })
-          .catch((err) => {
-            if (err.response && err.response.status !== 404) {
-              clearInterval(timer)
-              resolve({ path: result.path })
-            }
-          })
+      const timer = setInterval(async () => {
+        const check = await this.headApi(`${API_URL}/files/${result.path}`)
+        if (check) {
+          clearInterval(timer)
+          resolve({ path: result.path })
+        }
       }, delay)
     })
   }
