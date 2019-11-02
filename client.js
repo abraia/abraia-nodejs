@@ -95,8 +95,7 @@ module.exports.Client = class Client {
       return true
     } catch (err) {
       if (err.response && err.response.status === 404) return false
-      if (err.response && err.response.status === 403) return true
-      throw createError(err)
+      return true
     }
   }
 
