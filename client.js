@@ -100,7 +100,9 @@ module.exports.Client = class Client {
   }
 
   async loadUser() {
-    return await this.getApi(`${API_URL}/users`)
+    if (this.auth.username && this.auth.password) 
+      return await this.getApi(`${API_URL}/users`)
+    return new APIError('Unauthorized', 401)
   }
 
   async listFiles(path = '') {
@@ -148,7 +150,7 @@ module.exports.Client = class Client {
         config.data = file.stream
         config.headers['Content-Length'] = file.size
       }
-      if (params.public) config.headers['x-amz-acl'] = 'public-read'
+      if (params.access === 'public') config.headers['x-amz-acl'] = 'public-read'
       if (callback instanceof Function) config.onUploadProgress = callback
       const res = await axios(config)
       if (res.status === 200) return dataFile(name, source, file.size)
