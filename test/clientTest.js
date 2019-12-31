@@ -106,7 +106,7 @@ describe('client class', () => {
 
   it('transform video', async () => {
     const result = await client.transformVideo('demo/videos/bigbuckbunny.mp4', { fmt: 'jpg' })
-    assert(result.path === 'demo/videos/bigbuckbunny.jpg')
+    assert(result.path.startsWith('demo/videos/bigbuckbunny'))
   }).timeout(30000)
 
   it('download non existing file', () => {

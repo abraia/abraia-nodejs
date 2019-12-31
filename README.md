@@ -4,10 +4,13 @@
 
 # Abraia API client for Node.js
 
-Node.js client for [Abraia](https://abraia.me) services. It is used to smartly
-[optimize images for web](https://abraia.me/docs/image-optimization). Every
-image is analyzed to choose the best image compression parameters for ecommerce
-and web optimization (best image quality with the minimal files size).
+Node.js client for [Abraia](https://abraia.me) services, focus on image and
+video optimization for fashion ecommerce and multichannel marketing.
+
+- [Image optimization for web](https://abraia.me/docs/image-optimization).
+- [Video optimization for web](https://abraia.me/docs/video-optimization).
+
+Get the best image and video quality with the minimal file size.
 
 ## Installation
 
