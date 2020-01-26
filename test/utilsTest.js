@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const { parseString, sizeFormat, parseQuery, stringifyParams } = require('../utils')
+const { parseString, sizeFormat, parseQuery, stringifyParams, csvToJson } = require('../utils')
 
 describe('client utils', () => {
   it('parse output', () => {
@@ -21,5 +21,10 @@ describe('client utils', () => {
   it('stringify query', () => {
     const query = stringifyParams({ width: 300, height: 200 })
     assert(query === 'width=300&height=200')
+  })
+
+  it('csv to json', () => {
+    const json = csvToJson('image, text\ntest.jpg, test')
+    assert(json[0].image === 'test.jpg')
   })
 })
