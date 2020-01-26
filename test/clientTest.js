@@ -1,21 +1,9 @@
 require('dotenv').config()
 
-const fs = require('fs')
 const assert = require('chai').assert
+const fs = require('fs')
 
-const { parseOutput, sizeFormat, Client } = require('../client')
-
-describe('client utils', () => {
-  it('parse output', () => {
-    const output = parseOutput('{name}.{ext}', { name: 'test', ext: 'jpg' })
-    assert(output === 'test.jpg')
-  })
-  
-  it('size format', () => {
-    const size = sizeFormat(127806)
-    assert(size === '124.81 KB')
-  })
-})
+const { Client } = require('../client')
 
 const client = new Client()
 
