@@ -74,7 +74,7 @@ describe('Abraia', () => {
   it('process branded image', async () => {
     const filename = 'images/tiger_brand.jpg'
     await abraia.fromStore('tiger.jpg')
-      .process({ action: 'test.atn' })
+      .process({ action: 'test.atn', height: 333 })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)

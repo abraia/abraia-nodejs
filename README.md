@@ -92,7 +92,7 @@ abraia.fromFile('images/tiger.jpg')
 
 ## Editing and branding images
 
-Abraia implements a [graphical web editor](https://abraia.me/console/) to work with templates,
+Abraia implements a [graphical web editor](https://abraia.me/console/editor) to work with templates,
 which enables full image editing automation.
 
 ```js
