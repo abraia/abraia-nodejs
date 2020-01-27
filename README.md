@@ -90,6 +90,19 @@ abraia.fromFile('images/tiger.jpg')
 
 *Tiger image resized to a height of 333 pixels*
 
+## Editing and branding images
+
+Abraia implements a [graphical web editor](https://abraia.me/console/) to work with templates,
+which enables full image editing automation.
+
+```js
+abraia.fromFile('images/tiger.jpg')
+  .process({ action: 'test.atn' })
+  .toFile('images/tiger_brand.jpg')
+```
+
+![Branded tiger image](https://github.com/abraia/abraia-nodejs/raw/master/images/tiger_brand.jpg)
+
 ## License
 
 This software is licensed under the MIT License. [View the license](LICENSE).

@@ -166,6 +166,10 @@ module.exports.Client = class Client {
     return await this.headApi(`${API_URL}/files/${path}`)
   }
 
+  async analyzeImage(path, params = {}) {
+    return await this.getApi(`${API_URL}/analysis/${path}`, params)
+  }
+
   async transformImage(path, params = {}) {
     if (params.action) {
       params.background = `${API_URL}/images/${path}`
@@ -174,10 +178,6 @@ module.exports.Client = class Client {
     }
     const config = { responseType: 'arraybuffer' }
     return await this.getApi(`${API_URL}/images/${path}`, params, config)
-  }
-
-  async analyzeImage(path, params = {}) {
-    return await this.getApi(`${API_URL}/analysis/${path}`, params)
   }
 
   async transformVideo(path, params = {}, delay = 5000) {
@@ -191,5 +191,15 @@ module.exports.Client = class Client {
         }
       }, delay)
     })
+  }
+
+  async transformMedia(path, params) {
+    const type = mime.getType(path)
+    if (type && type.startsWith('video')) {
+      const result = await this.transformVideo(path, params)
+      return this.downloadFile(result.path)
+    } else {
+      return this.transformImage(path, params)
+    }
   }
 }

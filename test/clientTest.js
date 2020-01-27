@@ -82,19 +82,24 @@ describe('client class', () => {
     assert(result === true)
   }).timeout(30000)
 
-  it('transform image', async () => {
-    const data = await client.transformImage('demo/lion.jpg', { w: 300 })
-    assert(Buffer.isBuffer(data))
-  }).timeout(30000)
-
   it('analyze image', async () => {
     const result = await client.analyzeImage('demo/lion.jpg', { ar: 1 })
     assert(result instanceof Object)
   }).timeout(30000)
 
+  it('transform image', async () => {
+    const data = await client.transformImage('demo/lion.jpg', { w: 300 })
+    assert(Buffer.isBuffer(data))
+  }).timeout(30000)
+
   it('transform video', async () => {
     const result = await client.transformVideo('demo/videos/bigbuckbunny.mp4', { fmt: 'jpg' })
     assert(result.path.startsWith('demo/videos/bigbuckbunny'))
+  }).timeout(30000)
+
+  it('transform media', async () => {
+    const data = await client.transformMedia('demo/videos/bigbuckbunny.mp4', { format: 'jpg' })
+    assert(Buffer.isBuffer(data))
   }).timeout(30000)
 
   it('download non existing file', () => {

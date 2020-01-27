@@ -1,7 +1,6 @@
 const { folder } = require('./config')
 const { Client } = require('./client')
 const md5File = require('md5-file')
-const mime = require('mime')
 const fs = require('fs')
 
 const client = new Client()
@@ -49,20 +48,14 @@ const fromStore = async (path) => {
 
 const toBuffer = async (params, values) => {
   if (params && params.fmt && !values.params.fmt) values.params.fmt = params.fmt
-  const type = mime.getType(values.path)
-  if (type && type.startsWith('video')) {
-    const result = await client.transformVideo(values.path, values.params)
-    return client.downloadFile(result.path)
-  } else {
-    return client.transformImage(values.path, values.params)
-  }
+  return client.transformMedia(values.path, values.params)
 }
 
 const toFile = (path, values) => {
   if (Object.keys(values.params).length && !values.params.fmt && path.split('.').length) {
     values.params.fmt = path.split('.').pop().toLowerCase()
   }
-  return client.transformImage(values.path, values.params)
+  return client.transformMedia(values.path, values.params)
     .then((data) => {
       fs.writeFileSync(path, data)
       Promise.resolve(path)
