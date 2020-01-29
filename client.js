@@ -180,7 +180,23 @@ module.exports.Client = class Client {
     return await this.getApi(`${API_URL}/images/${path}`, params, config)
   }
 
+  async createOverlay(path, params) {
+    const userid = path.split('/')[0]
+    const action = `${userid}/${params.action}`
+    const name = `overlay-${action.split('/').pop().split('.')[0]}.png`
+    const overlay = `${path.slice(0, path.lastIndexOf('/'))}/${name}`
+    const buffer = await this.transformImage(action, { format: 'png' })
+    const file = { name, size: buffer.length, stream: buffer }
+    await this.uploadFile(file, overlay)
+    return overlay
+  }
+
   async transformVideo(path, params = {}, delay = 5000) {
+    if (params.action) {
+      params.overlay = await this.createOverlay(path, params)
+      // const video = await transformActionVideo(client, path, params)
+      // if (video.params) params = Object.assign(params, video.params)
+    }
     const result = await this.getApi(`${API_URL}/videos/${path}`, params)
     return await new Promise(resolve => {
       const timer = setInterval(async () => {

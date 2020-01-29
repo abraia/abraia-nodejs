@@ -82,7 +82,7 @@ describe('Abraia', () => {
   it('process branded video', async () => {
     const filename = 'images/video_brand.jpg'
     await abraia.fromStore('videos/bigbuckbunny.mp4')
-      .process({ action: 'test-video.atn' })
+      .process({ action: 'videos/test.atn' })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
   }).timeout(25000)
