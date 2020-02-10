@@ -97,6 +97,12 @@ describe('client class', () => {
     assert(result.path.startsWith('demo/videos/bigbuckbunny'))
   }).timeout(30000)
 
+  it('transform action', async () => {
+    const [path, params] = await client.transformAction('demo/lion.jpg', { action: 'test.atn' })
+    assert(path === 'demo/lion.jpg')
+    assert(params.action === 'lion.atn')
+  }).timeout(30000)
+
   it('transform media', async () => {
     const data = await client.transformMedia('demo/videos/bigbuckbunny.mp4', { format: 'jpg' })
     assert(Buffer.isBuffer(data))

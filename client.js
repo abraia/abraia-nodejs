@@ -4,6 +4,8 @@ followRedirects.maxBodyLength = 100 * 1024 * 1024  // 100 MB
 const axios = require('axios')
 const mime = require('mime')
 
+const utils = require('./utils')
+
 const API_URL = 'https://api.abraia.me'
 
 class APIError extends Error {
@@ -30,6 +32,17 @@ const dataFile = (name, source, size) => {
     thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
   }
 }
+
+const saveAction = async (client, path, params, json) => {
+  const userid = path.split('/')[0];
+  const output = utils.parseOutput(path, params);
+  const folder = path.slice(0, path.lastIndexOf('/'));
+  const name = `${output.slice(0, output.lastIndexOf('.'))}.atn`;
+  const stream = JSON.stringify(json);
+  const size = stream.length;
+  const file = await client.uploadFile({ name, size, stream }, `${folder}/${name}`);
+  return file.path.slice(userid.length + 1); // action file
+};
 
 module.exports.Client = class Client {
   constructor() {
@@ -207,6 +220,31 @@ module.exports.Client = class Client {
         }
       }, delay)
     })
+  }
+
+  async transformAction(path, params) {
+    if (path.endsWith('.atn') || params.action) {
+      let action = path;
+      if (params.action) {
+        const userid = path.split('/')[0];
+        action = `${userid}/${params.action}`;
+      }
+      let json = await this.getApi(`${API_URL}/files/${action}`)
+      const video = utils.parseActionVideo(json)
+      if (path.endsWith('.atn') && video.path) path = video.path
+      if (video.params) params = Object.assign(params, video.params)
+      const type = mime.getType(path)
+      // console.log(json)
+      if (type && type.startsWith('video')) {
+        // const video = await transformActionVideo(client, action, params)
+        // TODO: save action video
+      } else if (type && type.startsWith('image')) {
+        json = await utils.transformActionImage(path, params, json)
+        params.action = await saveAction(this, path, params, json)
+      }
+      // console.log(json)
+    }
+    return [path, params]
   }
 
   async transformMedia(path, params) {

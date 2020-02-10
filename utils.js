@@ -15,6 +15,22 @@ module.exports.sizeFormat = (bytes = 0, decimals = 2) => {
   return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${sizes[i]}`
 }
 
+const parsePath = (path) => {
+  const folder = path.slice(0, path.lastIndexOf('/'));
+  const filename = path.slice(folder.length + 1);
+  const name = filename.slice(0, filename.lastIndexOf('.'));
+  const ext = filename.slice(name.length + 1);
+  return { folder, name, ext };
+};
+
+module.exports.parseOutput = (path, params) => {
+  let { output } = params;
+  output = output || '{name}.{ext}';
+  let { name, ext } = parsePath(path);
+  ext = params.format || ext;
+  return this.parseString(output, Object.assign({ name, ext }, params));
+};
+
 module.exports.parseQuery = (query) => {
   const params = decodeURIComponent(query).split('&').reduce((prev, curr) => {
     const [name, value] = curr.split('=');
@@ -45,3 +61,57 @@ module.exports.csvToJson = (content) => {
   const matrix = CSVToMatrix(content, ',');
   return MatrixToJSON(matrix, 1);
 };
+
+module.exports.parseActionImage = (json) => {
+  let path, params;
+  if (json.backgroundImage) {
+    const [url, query] = json.backgroundImage.src.split('?');
+    params = this.parseQuery(query);
+    path = url.split('/').slice(4).join('/');
+  }
+  return { path, params };
+};
+
+module.exports.parseActionVideo = (json) => {
+  const background = json.background || 'white';
+  const videos = json.objects.filter(obj => obj.type === 'video');
+  const video = videos.pop();
+  let path, params;
+  if (video) {
+    const { src } = video;
+    const width = json.width / json.zoom;
+    const height = json.height / json.zoom;
+    const videoWidth = video.width * video.scaleX;
+    const videoHeight = video.height * video.scaleY;
+    const mode = (videoWidth >= width && videoHeight >= height) ? 'crop' : 'pad';
+    params = { width, height, mode, background };
+    path = src.split('/').slice(4).join('/');
+  }
+  return { path, params };
+};
+
+module.exports.transformActionImage = (path, params, json) => {
+  const background = `https://api.abraia.me/images/${path}`;
+  if (json.backgroundImage) {
+    const [url, query] = json.backgroundImage.src.split('?');
+    json.backgroundImage.src = query ? `${background}?${query}` : background;
+  } else {
+    let id = 0;
+    json.objects.forEach((obj) => {
+      if (obj.type === 'image' && obj.src.startsWith('http')) {
+        const width = Math.round(obj.width * obj.scaleX);
+        const height = Math.round(obj.height * obj.scaleY);
+        if (id === 0) {
+          obj.src = `${background}?width=${width}&height=${height}`;
+          obj.cropX = 0;
+          obj.cropY = 0;
+        }
+      }
+    });
+  }
+  return json;
+};
+
+// const transformActionVideo = (path, params, json) => {
+//   return;
+// };
