@@ -88,12 +88,12 @@ describe('client class', () => {
   }).timeout(30000)
 
   it('transform image', async () => {
-    const data = await client.transformImage('demo/lion.jpg', { w: 300 })
+    const data = await client.transformImage('demo/lion.jpg', { width: 300 })
     assert(Buffer.isBuffer(data))
   }).timeout(30000)
 
   it('transform video', async () => {
-    const result = await client.transformVideo('demo/videos/bigbuckbunny.mp4', { fmt: 'jpg' })
+    const result = await client.transformVideo('demo/videos/bigbuckbunny.mp4', { format: 'jpg' })
     assert(result.path.startsWith('demo/videos/bigbuckbunny'))
   }).timeout(30000)
 

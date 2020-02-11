@@ -229,7 +229,9 @@ module.exports.Client = class Client {
         const userid = path.split('/')[0];
         action = `${userid}/${params.action}`;
       }
-      let json = await this.getApi(`${API_URL}/files/${action}`)
+      // let json = await this.getApi(`${API_URL}/files/${action}`)
+      const resp = await axios.get(`${API_URL}/files/${action}`)
+      let json = resp.data
       const video = utils.parseActionVideo(json)
       if (path.endsWith('.atn') && video.path) path = video.path
       if (video.params) params = Object.assign(params, video.params)
