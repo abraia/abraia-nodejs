@@ -9,7 +9,7 @@ describe('Abraia', () => {
   it('load user data', async () => {
     const result = await abraia.user()
     assert(result instanceof Object)
-  }).timeout(25000)
+  }).timeout(5000)
 
   it('list stored files', async () => {
     const result = await abraia.files()
@@ -95,5 +95,5 @@ describe('Abraia', () => {
   it('delete stored image', async () => {
     const result = await abraia.fromStore('lion.jpg').delete()
     assert(result.file.name === 'lion.jpg')
-  }).timeout(25000)
+  }).timeout(5000)
 })

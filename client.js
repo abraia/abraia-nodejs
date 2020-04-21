@@ -23,27 +23,6 @@ const createError = (err) => {
   return new APIError(err.message)
 }
 
-const dataFile = (name, source, size) => {
-  return {
-    name, size,
-    path: source,
-    type: mime.getType(name),
-    source: `${API_URL}/files/${source}`,
-    thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
-  }
-}
-
-const saveAction = async (client, path, params, json) => {
-  const userid = path.split('/')[0];
-  const output = utils.parseOutput(path, params);
-  const folder = path.slice(0, path.lastIndexOf('/'));
-  const name = `${output.slice(0, output.lastIndexOf('.'))}.atn`;
-  const stream = JSON.stringify(json);
-  const size = stream.length;
-  const file = await client.uploadFile({ name, size, stream }, `${folder}/${name}`);
-  return file.path.slice(userid.length + 1); // action file
-};
-
 module.exports.Client = class Client {
   constructor() {
     const abraiaKey = process.env.ABRAIA_KEY
@@ -129,7 +108,7 @@ module.exports.Client = class Client {
   async uploadRemote(url, path) {
     const { file } = await this.postApi(`${API_URL}/files/${path}`, { url })
     const { name, source, size } = file
-    return dataFile(name, source, size)
+    return utils.dataFile(name, source, size)
   }
 
   async uploadFile(file, path = '', callback = undefined, params = {}) {
@@ -149,10 +128,10 @@ module.exports.Client = class Client {
       if (params.access === 'public') config.headers['x-amz-acl'] = 'public-read'
       if (callback instanceof Function) config.onUploadProgress = callback
       const res = await axios(config)
-      if (res.status === 200) return dataFile(name, source, file.size)
+      if (res.status === 200) return utils.dataFile(name, source, file.size)
     } else {
       if (callback instanceof Function) callback({ loaded: result.file.size })
-      return dataFile(result.file.name, result.file.source, result.file.size)
+      return utils.dataFile(result.file.name, result.file.source, result.file.size)
     }
   }
 
@@ -222,6 +201,17 @@ module.exports.Client = class Client {
     })
   }
 
+  async saveAction(path, params, json) {
+    const userid = path.split('/')[0];
+    const output = utils.parseOutput(path, params);
+    const folder = path.slice(0, path.lastIndexOf('/'));
+    const name = `${output.slice(0, output.lastIndexOf('.'))}.atn`;
+    const stream = JSON.stringify(json);
+    const size = stream.length;
+    const file = await this.uploadFile({ name, size, stream }, `${folder}/${name}`);
+    return file.path.slice(userid.length + 1); // action file
+  }
+
   async transformAction(path, params) {
     if (path.endsWith('.atn') || params.action) {
       let action = path;
@@ -242,7 +232,7 @@ module.exports.Client = class Client {
         // TODO: save action video
       } else if (type && type.startsWith('image')) {
         json = await utils.transformActionImage(path, params, json)
-        params.action = await saveAction(this, path, params, json)
+        params.action = await this.saveAction(path, params, json)
       }
       // console.log(json)
     }
@@ -257,5 +247,15 @@ module.exports.Client = class Client {
     } else {
       return this.transformImage(path, params)
     }
+  }
+
+  async transformFile(path, params) {
+    [path, params] = await this.transformAction(path, params)
+    const output = utils.parseOutput(path, params)
+    const ext = output.split('.').pop().toLowerCase()
+    params.format = (ext === 'mov') ? 'mp4' : ext
+    // console.log('transform media', output, path, params)
+    const buffer = await this.transformMedia(path, params)
+    return { buffer, type: mime.getType(output), name: output }
   }
 }

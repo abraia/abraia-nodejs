@@ -108,6 +108,11 @@ describe('client class', () => {
     assert(Buffer.isBuffer(data))
   }).timeout(30000)
 
+  it('transform file', async () => {
+    const data = await client.transformFile('demo/videos/bigbuckbunny.mp4', { format: 'jpg' })
+    assert(Buffer.isBuffer(data))
+  }).timeout(30000)
+
   it('download non existing file', () => {
     client.downloadFile('demo/Adler.jpg')
       .catch(err => assert(err instanceof Object))

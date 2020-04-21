@@ -1,3 +1,13 @@
+module.exports.dataFile = (name, source, size) => {
+  return {
+    name, size,
+    path: source,
+    type: mime.getType(name),
+    source: `${API_URL}/files/${source}`,
+    thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
+  }
+}
+
 module.exports.parseString = (string, params) => {
   String.prototype.interpolate = function (params) {
     const names = Object.keys(params)
@@ -60,6 +70,10 @@ const MatrixToJSON = (matrix, from, to) => {
 module.exports.csvToJson = (content) => {
   const matrix = CSVToMatrix(content, ',');
   return MatrixToJSON(matrix, 1);
+};
+
+module.exports.parseActionFonts = (json) => {
+  return json.objects.filter(obj => obj.type === 'i-text').map(obj => obj.fontFamily);
 };
 
 module.exports.parseActionImage = (json) => {
