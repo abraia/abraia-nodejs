@@ -12,7 +12,7 @@ describe('client class', () => {
     const result = await client.loadUser()
     assert(result instanceof Object)
     assert(result.user.id === 'demo')
-  }).timeout(30000)
+  }).timeout(5000)
 
   it('list files', async () => {
     const result = await client.listFiles('demo/')
@@ -24,7 +24,7 @@ describe('client class', () => {
     const result = await client.createFolder('demo/test/')
     assert(result.name === 'test')
     assert(result.path === 'demo/test/')
-  }).timeout(30000)
+  }).timeout(5000)
 
   it('upload remote', async () => {
     const url = 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Adler.jpg'
@@ -75,7 +75,7 @@ describe('client class', () => {
     const { file } = await client.deleteFile('demo/Adler.jpg')
     assert(file.name === 'Adler.jpg')
     assert(file.source === 'demo/Adler.jpg')
-  }).timeout(30000)
+  }).timeout(5000)
 
   it('check file', async () => {
     const result = await client.checkFile('demo/lion.jpg')
@@ -109,8 +109,8 @@ describe('client class', () => {
   }).timeout(30000)
 
   it('transform file', async () => {
-    const data = await client.transformFile('demo/videos/bigbuckbunny.mp4', { format: 'jpg' })
-    assert(Buffer.isBuffer(data))
+    const file = await client.transformFile('demo/videos/bigbuckbunny.mp4', { output: 'bigbuckbunny.jpg' })
+    assert(Buffer.isBuffer(file.buffer))
   }).timeout(30000)
 
   it('download non existing file', () => {
@@ -121,5 +121,5 @@ describe('client class', () => {
   it('analyze non existing image', () => {
     client.analyzeImage('demo/Adler.jpg')
       .catch(err => assert(err instanceof Object))
-  }).timeout(30000)
+  }).timeout(5000)
 })

@@ -8,6 +8,16 @@ const utils = require('./utils')
 
 const API_URL = 'https://api.abraia.me'
 
+const dataFile = (name, source, size) => {
+  return {
+    name, size,
+    path: source,
+    type: mime.getType(name),
+    source: `${API_URL}/files/${source}`,
+    thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
+  }
+}
+
 class APIError extends Error {
   constructor(message, code = 0) {
     super(message)
@@ -108,7 +118,7 @@ module.exports.Client = class Client {
   async uploadRemote(url, path) {
     const { file } = await this.postApi(`${API_URL}/files/${path}`, { url })
     const { name, source, size } = file
-    return utils.dataFile(name, source, size)
+    return dataFile(name, source, size)
   }
 
   async uploadFile(file, path = '', callback = undefined, params = {}) {
@@ -128,10 +138,10 @@ module.exports.Client = class Client {
       if (params.access === 'public') config.headers['x-amz-acl'] = 'public-read'
       if (callback instanceof Function) config.onUploadProgress = callback
       const res = await axios(config)
-      if (res.status === 200) return utils.dataFile(name, source, file.size)
+      if (res.status === 200) return dataFile(name, source, file.size)
     } else {
       if (callback instanceof Function) callback({ loaded: result.file.size })
-      return utils.dataFile(result.file.name, result.file.source, result.file.size)
+      return dataFile(result.file.name, result.file.source, result.file.size)
     }
   }
 
@@ -202,22 +212,22 @@ module.exports.Client = class Client {
   }
 
   async saveAction(path, params, json) {
-    const userid = path.split('/')[0];
-    const output = utils.parseOutput(path, params);
-    const folder = path.slice(0, path.lastIndexOf('/'));
-    const name = `${output.slice(0, output.lastIndexOf('.'))}.atn`;
-    const stream = JSON.stringify(json);
-    const size = stream.length;
-    const file = await this.uploadFile({ name, size, stream }, `${folder}/${name}`);
-    return file.path.slice(userid.length + 1); // action file
+    const userid = path.split('/')[0]
+    const output = utils.parseOutput(path, params)
+    const folder = path.slice(0, path.lastIndexOf('/'))
+    const name = `${output.slice(0, output.lastIndexOf('.'))}.atn`
+    const stream = JSON.stringify(json)
+    const size = stream.length
+    const file = await this.uploadFile({ name, size, stream }, `${folder}/${name}`)
+    return file.path.slice(userid.length + 1) // action file
   }
 
   async transformAction(path, params) {
     if (path.endsWith('.atn') || params.action) {
-      let action = path;
+      let action = path
       if (params.action) {
-        const userid = path.split('/')[0];
-        action = `${userid}/${params.action}`;
+        const userid = path.split('/')[0]
+        action = `${userid}/${params.action}`
       }
       // let json = await this.getApi(`${API_URL}/files/${action}`)
       const resp = await axios.get(`${API_URL}/files/${action}`)
