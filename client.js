@@ -224,19 +224,18 @@ module.exports.Client = class Client {
 
   async transformAction(path, params) {
     if (path.endsWith('.atn') || params.action) {
-      let action = path
-      if (params.action) {
-        const userid = path.split('/')[0]
-        action = `${userid}/${params.action}`
-      }
+      const userid = path.split('/')[0]
+      const action = params.action ? `${userid}/${params.action}` : path
       // let json = await this.getApi(`${API_URL}/files/${action}`)
       const resp = await axios.get(`${API_URL}/files/${action}`)
       let json = resp.data
       const video = utils.parseActionVideo(json)
-      if (path.endsWith('.atn') && video.path) path = video.path
+      if (path.endsWith('.atn') && video.path) {
+        params.action = path.slice(path.indexOf('/') + 1)
+        path = video.path
+      }
       if (video.params) params = Object.assign(params, video.params)
       const type = mime.getType(path)
-      // console.log(json)
       if (type && type.startsWith('video')) {
         // const video = await transformActionVideo(client, action, params)
         // TODO: save action video
@@ -244,7 +243,6 @@ module.exports.Client = class Client {
         json = await utils.transformActionImage(path, params, json)
         params.action = await this.saveAction(path, params, json)
       }
-      // console.log(json)
     }
     return [path, params]
   }
