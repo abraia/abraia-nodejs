@@ -1,6 +1,6 @@
 {
   "name": "abraia",
-  "version": "0.6.14",
+  "version": "0.6.15",
   "description": "Abraia Node SDK",
   "scripts": {
     "test": "nyc mocha --reporter spec",
@@ -28,13 +28,13 @@
   "dependencies": {
     "axios": "^0.19.2",
     "md5-file": "^4.0.0",
-    "mime": "^2.4.4"
+    "mime": "^2.4.5"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "coveralls": "^3.0.11",
+    "coveralls": "^3.1.0",
     "dotenv": "^8.2.0",
-    "mocha": "^7.1.1",
+    "mocha": "^7.1.2",
     "nyc": "^15.0.1"
   }
 }

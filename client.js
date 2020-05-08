@@ -192,19 +192,16 @@ module.exports.Client = class Client {
     await this.uploadFile(file, overlay)
     return overlay
   }
-
+  
   async transformVideo(path, params = {}, delay = 5000) {
-    if (params.action) {
-      params.overlay = await this.createOverlay(path, params)
-      // const video = await transformActionVideo(client, path, params)
-      // if (video.params) params = Object.assign(params, video.params)
-    }
+    if (params.action) params.overlay = await this.createOverlay(path, params)
     const result = await this.getApi(`${API_URL}/videos/${path}`, params)
     return await new Promise(resolve => {
       const timer = setInterval(async () => {
         const check = await this.headApi(`${API_URL}/files/${result.path}`)
         if (check) {
           clearInterval(timer)
+          if (params.action) await this.deleteFile(params.overlay);
           resolve({ path: result.path })
         }
       }, delay)
@@ -262,7 +259,8 @@ module.exports.Client = class Client {
     const output = utils.parseOutput(path, params)
     const ext = output.split('.').pop().toLowerCase()
     params.format = (ext === 'mov') ? 'mp4' : ext
-    // console.log('transform media', output, path, params)
+    params.output = output
+    // console.log('transform media', path, params)
     const buffer = await this.transformMedia(path, params)
     return { buffer, type: mime.getType(output), name: output }
   }
