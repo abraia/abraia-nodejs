@@ -31,14 +31,14 @@ const fromFile = async (file) => {
   const name = (file.path) ? file.path.split('/').pop() : file.split('/').pop()
   const size = (file.contents) ? file.contents.length : fs.statSync(file)['size']
   const stream = (file.contents) ? file.contents : fs.createReadStream(file)
-  return client.uploadFile({ name, size, md5, stream }, `${userid}/${folder}${name}`)
-    .then(resp => Promise.resolve({ path: resp.path, params: { q: 'auto' } }))
+  const resp = await client.uploadFile({ name, size, md5, stream }, `${userid}/${folder}${name}`)
+  return Promise.resolve({ path: resp.path, params: { q: 'auto' } })
 }
 
 const fromUrl = async (url) => {
   if (!userid) userid = await userId()
-  return client.uploadRemote(url, `${userid}/${folder}`)
-    .then(resp => Promise.resolve({ path: resp.path, params: { q: 'auto' } }))
+  const resp = await client.uploadRemote(url, `${userid}/${folder}`)
+  return Promise.resolve({ path: resp.path, params: { q: 'auto' } })
 }
 
 const fromStore = async (path) => {
@@ -48,18 +48,17 @@ const fromStore = async (path) => {
 
 const toBuffer = async (params, values) => {
   if (params && params.fmt && !values.params.fmt) values.params.fmt = params.fmt
-  return client.transformMedia(values.path, values.params)
+  const data = await client.transformFile(values.path, values.params)
+  return data.buffer
 }
 
-const toFile = (path, values) => {
-  if (Object.keys(values.params).length && !values.params.fmt && path.split('.').length) {
+const toFile = async (path, values) => {
+  if (values.params && !values.params.fmt && path.split('.').length) {
     values.params.fmt = path.split('.').pop().toLowerCase()
   }
-  return client.transformMedia(values.path, values.params)
-    .then((data) => {
-      fs.writeFileSync(path, data)
-      Promise.resolve(path)
-    })
+  const data = await client.transformFile(values.path, values.params)
+  fs.writeFileSync(path, data.buffer)
+  return Promise.resolve(path)
 }
 
 const resize = (params, values) => {
