@@ -140,7 +140,8 @@ module.exports.Client = class Client {
       const res = await axios(config)
       if (res.status === 200) return dataFile(name, source, file.size)
     } else {
-      if (callback instanceof Function) callback({ loaded: result.file.size })
+      // TODO: Refactor code...
+      if (callback instanceof Function) callback({ loaded: result.file.size, total: result.file.size })
       return dataFile(result.file.name, result.file.source, result.file.size)
     }
   }
@@ -166,6 +167,10 @@ module.exports.Client = class Client {
 
   async checkFile(path) {
     return await this.headApi(`${API_URL}/files/${path}`)
+  }
+
+  async publishFile(path) {
+    return await this.getApi(`${API_URL}/files/${path}`, { access: 'public' })
   }
 
   async analyzeImage(path, params = {}) {

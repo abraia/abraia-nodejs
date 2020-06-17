@@ -82,6 +82,12 @@ describe('client class', () => {
     assert(result === true)
   }).timeout(30000)
 
+  it('publish file', async () => {
+    const result = await client.publishFile('demo/lion.jpg')
+    assert(result.name === 'lion.jpg')
+    assert(result.source === 'demo/lion.jpg')
+  }).timeout(30000)
+
   it('analyze image', async () => {
     const result = await client.analyzeImage('demo/lion.jpg', { ar: 1 })
     assert(result instanceof Object)
