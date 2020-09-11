@@ -2,18 +2,23 @@
 const followRedirects = require('follow-redirects')
 followRedirects.maxBodyLength = 100 * 1024 * 1024  // 100 MB
 const axios = require('axios')
-const mime = require('mime')
 
 const utils = require('./utils')
 
 const API_URL = 'https://api.abraia.me'
 
-const dataFile = (name, source, size) => {
+const dataFolder = (name, source) => {
+  return { name, path: source, source: `${API_URL}/files/${source}` }
+}
+
+const dataFile = (name, source, size, date) => {
+  // files[i].type = utils.getType(files[i].name)
+  // files[i].source = `${API_URL}/images/${files[i].source}`
+  // files[i].thumbnail = `${API_URL}/files/${files[i].thumbnail}`
+  // md5
   return {
-    name, size,
-    path: source,
-    type: mime.getType(name),
-    source: `${API_URL}/files/${source}`,
+    name, path: source, source: `${API_URL}/files/${source}`,
+    size, date, type: utils.getType(name),
     thumbnail: `${API_URL}/files/${source.slice(0, -name.length) + 'tb_' + name}`
   }
 }
@@ -86,7 +91,7 @@ module.exports.Client = class Client {
 
   async loadUser() {
     if (this.auth.username && this.auth.password) 
-      return await this.getApi(`${API_URL}/users`)
+      return this.getApi(`${API_URL}/users`)
     return new APIError('Unauthorized', 401)
   }
 
@@ -94,37 +99,25 @@ module.exports.Client = class Client {
     let { files, folders } = await this.getApi(`${API_URL}/files/${path}`)
     files = files.filter(file => !file.name.startsWith('.'))
     folders = folders.filter(folder => !folder.name.startsWith('.'))
-    for (const i in folders) {
-      folders[i].path = folders[i].source
-      folders[i].source = `${API_URL}/files/${folders[i].source}`
-    }
-    for (const i in files) {
-      files[i].path = files[i].source
-      files[i].source = `${API_URL}/images/${files[i].source}`
-      files[i].thumbnail = `${API_URL}/files/${files[i].thumbnail}`
-      if (files[i].name.endsWith('m3u8')) files[i].type = 'application/x-mpegURL'
-      else files[i].type = mime.getType(files[i].name)
-    }
+    folders = folders.map(({ name, source }) => dataFolder(name, source))
+    files = files.map(({ name, source, size, date }) => dataFile(name, source, size, date))
     return { files, folders }
   }
 
   async createFolder(path) {
     const { folder } = await this.postApi(`${API_URL}/files/${path}`)
-    folder.path = folder.source
-    folder.source = `${API_URL}/files/${folder.source}`
-    return folder
+    return dataFolder(folder.name, folder.source)
   }
 
   async uploadRemote(url, path) {
     const { file } = await this.postApi(`${API_URL}/files/${path}`, { url })
-    const { name, source, size } = file
-    return dataFile(name, source, size)
+    return dataFile(file.name, file.source, file.size, file.date)
   }
 
   async uploadFile(file, path = '', callback = undefined, params = {}) {
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()
-    const type = mime.getType(name) || 'binary/octet-stream'
+    const type = utils.getType(name) || 'binary/octet-stream'
     const data = (file.md5) ? { name, type, md5: file.md5 } : { name, type }
     const result = await this.postApi(`${API_URL}/files/${path}`, data, params)
     if (result.uploadURL) {
@@ -142,39 +135,41 @@ module.exports.Client = class Client {
     } else {
       // TODO: Refactor code...
       if (callback instanceof Function) callback({ loaded: result.file.size, total: result.file.size })
-      return dataFile(result.file.name, result.file.source, result.file.size)
+      return dataFile(result.file.name, result.file.source, result.file.size, result.file.date)
     }
   }
 
   async moveFile(oldPath, newPath) {
     const { file } = await this.postApi(`${API_URL}/files/${newPath}`, { store: oldPath })
-    file.path = file.source
-    file.source = `${API_URL}/files/${file.source}`
-    return file
+    return dataFile(file.name, file.source)
   }
 
   async downloadFile(path, callback = undefined) {
     const config = { responseType: 'arraybuffer' }
     if (callback instanceof Function) config.onDownloadProgress = callback
-    // return await this.getApi(`${API_URL}/files/${path}`, undefined, config)
+    // return this.getApi(`${API_URL}/files/${path}`, undefined, config)
     const resp = await axios.get(`${API_URL}/files/${path}`, config)
     return resp.data
   }
 
   async deleteFile(path) {
-    return await this.deleleApi(`${API_URL}/files/${path}`)
+    return this.deleleApi(`${API_URL}/files/${path}`)
   }
 
   async checkFile(path) {
-    return await this.headApi(`${API_URL}/files/${path}`)
+    return this.headApi(`${API_URL}/files/${path}`)
   }
 
   async publishFile(path) {
-    return await this.getApi(`${API_URL}/files/${path}`, { access: 'public' })
+    return this.getApi(`${API_URL}/files/${path}`, { access: 'public' })
+  }
+
+  async loadMetadata(path) {
+    return this.getApi(`${API_URL}/metadata/${path}`)
   }
 
   async analyzeImage(path, params = {}) {
-    return await this.getApi(`${API_URL}/analysis/${path}`, params)
+    return this.getApi(`${API_URL}/analysis/${path}`, params)
   }
 
   async transformImage(path, params = {}) {
@@ -184,7 +179,7 @@ module.exports.Client = class Client {
       path = `${path.split('/')[0]}/${params.action}`
     }
     const config = { responseType: 'arraybuffer' }
-    return await this.getApi(`${API_URL}/images/${path}`, params, config)
+    return this.getApi(`${API_URL}/images/${path}`, params, config)
   }
 
   async createOverlay(path, params) {
@@ -197,16 +192,30 @@ module.exports.Client = class Client {
     await this.uploadFile(file, overlay)
     return overlay
   }
-  
-  async transformVideo(path, params = {}, delay = 5000) {
-    if (params.action) params.overlay = await this.createOverlay(path, params)
+
+  async transformVideo(path, params = {}, callback = undefined, delay = 5000) {
+    let check
+    let processing = 0
+    if (params.output) {
+      const userid = path.split('/')[0]
+      const output = `${userid}/${params.output}`
+      await this.deleteFile(output)
+    }
+    if (params.action && !params.overlay) params.overlay = await this.createOverlay(path, params)
+    // TODO: Review to fix undefined format
     const result = await this.getApi(`${API_URL}/videos/${path}`, params)
-    return await new Promise(resolve => {
+    return new Promise(resolve => {
       const timer = setInterval(async () => {
-        const check = await this.headApi(`${API_URL}/files/${result.path}`)
+        processing += delay / 1000
+        // TODO: Review to check snapshot faster (images)
+        if (processing > 20) check = await this.headApi(`${API_URL}/files/${result.path}`)
+        if (callback instanceof Function) {
+          const progress = processing / (60 + (params.to || 300))
+          callback(progress)
+        }
         if (check) {
           clearInterval(timer)
-          if (params.action) await this.deleteFile(params.overlay);
+          if (params.action) await this.deleteFile(params.overlay)
           resolve({ path: result.path })
         }
       }, delay)
@@ -237,11 +246,11 @@ module.exports.Client = class Client {
         path = video.path
       }
       if (video.params) params = Object.assign(params, video.params)
-      const type = mime.getType(path)
-      if (type && type.startsWith('video')) {
+      if (utils.getType(path).startsWith('video')) {
         // const video = await transformActionVideo(client, action, params)
         // TODO: save action video
-      } else if (type && type.startsWith('image')) {
+      }
+      if (utils.getType(path).startsWith('image')) {
         json = await utils.transformActionImage(path, params, json)
         params.action = await this.saveAction(path, params, json)
       }
@@ -249,24 +258,20 @@ module.exports.Client = class Client {
     return [path, params]
   }
 
-  async transformMedia(path, params) {
-    const type = mime.getType(path)
-    if (type && type.startsWith('video')) {
-      const result = await this.transformVideo(path, params)
+  async transformMedia(path, params, callback = undefined) {
+    if (utils.getType(path).startsWith('video')) {
+      const result = await this.transformVideo(path, params, callback)
       return this.downloadFile(result.path)
     } else {
       return this.transformImage(path, params)
     }
   }
 
-  async transformFile(path, params) {
+  async transformFile(path, params, callback = undefined) {
     [path, params] = await this.transformAction(path, params)
-    const output = utils.parseOutput(path, params)
-    const ext = output.split('.').pop().toLowerCase()
-    params.format = (ext === 'mov') ? 'mp4' : ext
-    params.output = output
-    // console.log('transform media', path, params)
-    const buffer = await this.transformMedia(path, params)
-    return { buffer, type: mime.getType(output), name: output }
+    params.output = utils.parseOutput(path, params)
+    const buffer = await this.transformMedia(path, params, callback)
+    const name = params.output.split('/').pop()
+    return { buffer, name, type: utils.getType(name) }
   }
 }

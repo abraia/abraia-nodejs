@@ -80,13 +80,19 @@ describe('client class', () => {
   it('check file', async () => {
     const result = await client.checkFile('demo/lion.jpg')
     assert(result === true)
-  }).timeout(30000)
+  }).timeout(5000)
 
   it('publish file', async () => {
     const result = await client.publishFile('demo/lion.jpg')
     assert(result.name === 'lion.jpg')
     assert(result.source === 'demo/lion.jpg')
-  }).timeout(30000)
+  }).timeout(5000)
+
+  it('load metadata', async () => {
+    const meta = await client.loadMetadata('demo/lion.jpg')
+    assert(meta.MIMEType === 'image/jpeg')
+    assert(meta.ImageSize === '1920x1280')
+  }).timeout(5000)
 
   it('analyze image', async () => {
     const result = await client.analyzeImage('demo/lion.jpg', { ar: 1 })
@@ -115,7 +121,8 @@ describe('client class', () => {
   }).timeout(30000)
 
   it('transform file', async () => {
-    const file = await client.transformFile('demo/videos/bigbuckbunny.mp4', { output: 'bigbuckbunny.jpg' })
+    // TODO: Review to fix undefined format
+    const file = await client.transformFile('demo/videos/bigbuckbunny.mp4', { output: 'bigbuckbunny.jpg', format: 'jpg' })
     assert(Buffer.isBuffer(file.buffer))
   }).timeout(30000)
 

@@ -85,7 +85,7 @@ describe('Abraia', () => {
       .process({ action: 'videos/test.atn' })
       .toFile(filename)
     assert(fs.lstatSync(filename).isFile())
-  }).timeout(25000)
+  }).timeout(50000)
 
   it('restore stored image', async () => {
     await abraia.fromStore('lion.jpg').toFile('images/lion.bak.jpg')

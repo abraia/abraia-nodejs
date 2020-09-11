@@ -1,3 +1,10 @@
+const mime = require('mime')
+
+module.exports.getType = (path = '') => {
+  if (path.endsWith('.m3u8')) return 'application/x-mpegURL'
+  return mime.getType(path) || ''
+}
+
 module.exports.parseString = (string, params) => {
   String.prototype.interpolate = function (params) {
     const names = Object.keys(params)
@@ -8,7 +15,8 @@ module.exports.parseString = (string, params) => {
   return template.interpolate(params)
 }
 
-module.exports.sizeFormat = (bytes = 0, decimals = 2) => {
+module.exports.sizeFormat = (bytes, decimals = 2) => {
+  if (bytes === undefined) return '';
   if (bytes === 0) return '0 B'
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
