@@ -23,13 +23,26 @@ module.exports.sizeFormat = (bytes, decimals = 2) => {
   return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${sizes[i]}`
 }
 
-const parsePath = (path) => {
-  const folder = path.slice(0, path.lastIndexOf('/'))
-  const filename = path.slice(folder.length + 1)
-  const name = filename.slice(0, filename.lastIndexOf('.'))
-  const ext = filename.slice(name.length + 1)
+module.exports.dateFormat = (timestamp) => {
+  let strDate = '';
+  if (timestamp !== undefined) {
+    timestamp = timestamp.toString().length > 12 ? timestamp : timestamp * 1000;
+    const date = new Date(timestamp);
+    strDate = date.toLocaleString('en-GB', { timeZone: 'UTC' });
+  }
+  return strDate;
+};
+
+const parsePath = (path = '') => {
+  const dirname = path.substring(0, path.lastIndexOf('/'))
+  const folder = dirname && `${dirname}/`
+  const filename = path.substring(folder.length)
+  const name = filename.substring(0, filename.lastIndexOf('.')) || filename
+  const ext = filename.substring(name.length + 1)
   return { folder, name, ext }
 }
+
+module.exports.parsePath = parsePath
 
 module.exports.parseOutput = (path, params) => {
   let { output } = params
