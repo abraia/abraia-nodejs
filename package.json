@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/abraia/abraia-nodejs#readme",
   "dependencies": {
-    "axios": "^0.19.2",
-    "md5-file": "^4.0.0",
+    "axios": "^0.20.0",
+    "md5-file": "^5.0.0",
     "mime": "^2.4.6"
   },
   "devDependencies": {
