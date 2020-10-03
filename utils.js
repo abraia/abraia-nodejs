@@ -33,32 +33,34 @@ module.exports.dateFormat = (timestamp) => {
   return strDate;
 };
 
-const parsePath = (path = '') => {
-  const dirname = path.substring(0, path.lastIndexOf('/'))
+module.exports.parseUrl = (src = '') => {
+  const [url, query] = src.split('?')
+  return { url, query }
+}
+
+module.exports.parsePath = (path = '') => {
+  const { url } = this.parseUrl(path)
+  const dirname = url.substring(0, url.lastIndexOf('/'))
   const folder = dirname && `${dirname}/`
-  const filename = path.substring(folder.length)
+  const filename = url.substring(folder.length)
   const name = filename.substring(0, filename.lastIndexOf('.')) || filename
   const ext = filename.substring(name.length + 1)
   return { folder, name, ext }
 }
 
-module.exports.parsePath = parsePath
-
 module.exports.parseOutput = (path, params) => {
-  let { output } = params
-  output = output || '{name}.{ext}'
-  let { name, ext } = parsePath(path)
+  const output = params.output || '{name}.{ext}'
+  let { name, ext } = this.parsePath(path)
   ext = params.format || ext
   return this.parseString(output, Object.assign({ name, ext }, params))
 }
 
 module.exports.parseQuery = (query) => {
-  const params = decodeURIComponent(query).split('&').reduce((prev, curr) => {
+  return decodeURIComponent(query).split('&').reduce((prev, curr) => {
     const [name, value] = curr.split('=')
     prev[name] = value
     return prev
   }, {})
-  return params
 }
 
 module.exports.stringifyParams = (params) => {
@@ -66,42 +68,24 @@ module.exports.stringifyParams = (params) => {
   return encodeURI(query).replace(/#/g, '%23')
 }
 
-const CSVToMatrix = (csv, delimiter) => {
-  const matrix = []
-  csv.split('\n').map(l => (l.trim() === '' ? 0 : matrix.push(l.trim().split(delimiter).map(v => v.trim()))))
-  return matrix
-}
-
-const MatrixToJSON = (matrix, from, to) => {
-  from = from || 0
-  const jsonResult = matrix.map((a, i) => Object.assign({}, ...matrix[0].map((h, index) => ({ [h]: matrix[i][index] }))))
-  return to ? jsonResult.splice(from, to) : jsonResult.splice(from)
-}
-
-module.exports.csvToJson = (content) => {
-  const matrix = CSVToMatrix(content, ',')
-  return MatrixToJSON(matrix, 1)
-}
-
 module.exports.parseActionFonts = (json) => {
   return json.objects.filter(obj => obj.type === 'i-text').map(obj => obj.fontFamily)
 }
 
 module.exports.parseActionImage = (json) => {
-  let path, params
   if (json.backgroundImage) {
-    const [url, query] = json.backgroundImage.src.split('?')
-    params = this.parseQuery(query)
-    path = url.split('/').slice(4).join('/')
+    const { url, query } = this.parseUrl(json.backgroundImage.src)
+    const path = url.split('/').slice(4).join('/')
+    const params = this.parseQuery(query)
+    return { path, params }
   }
-  return { path, params }
+  return {}
 }
 
 module.exports.parseActionVideo = (json) => {
   const background = json.background || 'white'
   const videos = json.objects.filter(obj => obj.type === 'video')
   const video = videos.pop()
-  let path, params
   if (video) {
     const { src } = video
     const width = json.width / json.zoom
@@ -109,16 +93,17 @@ module.exports.parseActionVideo = (json) => {
     const videoWidth = video.width * video.scaleX
     const videoHeight = video.height * video.scaleY
     const mode = (videoWidth >= width && videoHeight >= height) ? 'crop' : 'pad'
-    params = { width, height, mode, background }
-    path = src.split('/').slice(4).join('/')
+    const params = { width, height, mode, background }
+    const path = src.split('/').slice(4).join('/')
+    return { path, params }
   }
-  return { path, params }
+  return {}
 }
 
 module.exports.transformActionImage = (path, params, json) => {
   const background = `https://api.abraia.me/images/${path}`
   if (json.backgroundImage) {
-    const [url, query] = json.backgroundImage.src.split('?')
+    const { query } = this.parseUrl(json.backgroundImage.src)
     json.backgroundImage.src = query ? `${background}?${query}` : background
   } else {
     let id = 0
@@ -137,6 +122,20 @@ module.exports.transformActionImage = (path, params, json) => {
   return json
 }
 
-// const transformActionVideo = (path, params, json) => {
-//   return
-// }
+module.exports.transformActionVideo = (path, params, json) => {
+  const src = `https://api.abraia.me/files/${path}`
+  let id = 0
+  json.objects.forEach((obj) => {
+    if (obj.type === 'video') {
+      if (id === 0) {
+        // const width = Math.round(obj.width * obj.scaleX)
+        // const height = Math.round(obj.height * obj.scaleY)
+        // obj.src = `${background}?width=${width}&height=${height}`
+        // obj.cropX = 0
+        // obj.cropY = 0
+        obj.src = src
+      }
+    }
+  })
+  return json
+}
