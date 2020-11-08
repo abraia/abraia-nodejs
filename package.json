@@ -1,6 +1,6 @@
 {
   "name": "abraia",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "Abraia Node SDK",
   "scripts": {
     "test": "nyc mocha --reporter spec",
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/abraia/abraia-nodejs#readme",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "md5-file": "^5.0.0",
     "mime": "^2.4.6"
   },

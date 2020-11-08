@@ -45,18 +45,17 @@ describe('client class', () => {
     assert(result.path === 'demo/lion.jpg')
   }).timeout(30000)
 
-  // it('upload public file', async () => {
-  //   const file = {
-  //     name: 'lion.jpg',
-  //     type: 'image/jpeg',
-  //     size: fs.statSync('images/lion.jpg')['size'],
-  //     stream: fs.createReadStream('images/lion.jpg')
-  //   }
-  //   const result = await client.uploadFile(file, 'demo/lion.jpg', null, { public: true})
-  //   console.log(result)
-  //   assert(result.name === 'lion.jpg')
-  //   assert(result.path === 'demo/lion.jpg')
-  // }).timeout(30000)
+  it('upload public file', async () => {
+    const file = {
+      name: 'lion.jpg',
+      type: 'image/jpeg',
+      size: fs.statSync('images/lion.jpg')['size'],
+      stream: fs.createReadStream('images/lion.jpg')
+    }
+    const result = await client.uploadFile(file, 'demo/lion.jpg', null, { public: true })
+    assert(result.name === 'lion.jpg')
+    assert(result.path === 'demo/lion.jpg')
+  }).timeout(30000)
 
   it('move file', async () => {
     await client.moveFile('demo/Adler.jpg', 'demo/test/Adler.jpg')
@@ -94,11 +93,6 @@ describe('client class', () => {
     assert(meta.ImageSize === '1920x1280')
   }).timeout(5000)
 
-  it('analyze image', async () => {
-    const result = await client.analyzeImage('demo/lion.jpg', { ar: 1 })
-    assert(result instanceof Object)
-  }).timeout(30000)
-
   it('transform image', async () => {
     const data = await client.transformImage('demo/lion.jpg', { width: 300 })
     assert(Buffer.isBuffer(data))
@@ -130,9 +124,4 @@ describe('client class', () => {
     client.downloadFile('demo/Adler.jpg')
       .catch(err => assert(err instanceof Object))
   }).timeout(30000)
-
-  it('analyze non existing image', () => {
-    client.analyzeImage('demo/Adler.jpg')
-      .catch(err => assert(err instanceof Object))
-  }).timeout(5000)
 })

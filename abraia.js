@@ -46,6 +46,7 @@ const fromStore = async (path) => {
   return Promise.resolve({ path: `${userid}/${path}`, params: {} })
 }
 
+// TODO: Replace params, format param only admited
 const toBuffer = async (params, values) => {
   if (params && params.fmt && !values.params.fmt) values.params.fmt = params.fmt
   const data = await client.transformFile(values.path, values.params)

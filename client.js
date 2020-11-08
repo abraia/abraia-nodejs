@@ -1,6 +1,6 @@
 // Setting Global follow-redirects maxBodyLength
 const followRedirects = require('follow-redirects')
-followRedirects.maxBodyLength = 100 * 1024 * 1024  // 100 MB
+followRedirects.maxBodyLength = 500 * 1024 * 1024  // 500 MB
 const axios = require('axios')
 
 const utils = require('./utils')
@@ -92,7 +92,7 @@ module.exports.Client = class Client {
   async loadUser() {
     if (this.auth.username && this.auth.password) 
       return this.getApi(`${API_URL}/users`)
-    return new APIError('Unauthorized', 401)
+    throw new APIError('Unauthorized', 401)
   }
 
   async listFiles(path = '') {
@@ -115,6 +115,7 @@ module.exports.Client = class Client {
   }
 
   async uploadFile(file, path = '', callback = undefined, params = {}) {
+    if (file.size && file.size > followRedirects.maxBodyLength) throw new APIError('File too long', 400);
     const source = path.endsWith('/') ? path + file.name : path
     const name = source.split('/').pop()
     const type = utils.getType(name) || 'binary/octet-stream'
@@ -133,7 +134,6 @@ module.exports.Client = class Client {
       const res = await axios(config)
       if (res.status === 200) return dataFile(name, source, file.size)
     } else {
-      // TODO: Refactor code...
       if (callback instanceof Function) callback({ loaded: result.file.size, total: result.file.size })
       return dataFile(result.file.name, result.file.source, result.file.size, result.file.date)
     }
@@ -168,8 +168,8 @@ module.exports.Client = class Client {
     return this.getApi(`${API_URL}/metadata/${path}`)
   }
 
-  async analyzeImage(path, params = {}) {
-    return this.getApi(`${API_URL}/analysis/${path}`, params)
+  async removeMetadata(path) {
+    return this.deleleApi(`${API_URL}/metadata/${path}`)
   }
 
   async transformImage(path, params = {}) {

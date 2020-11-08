@@ -1,6 +1,7 @@
 const mime = require('mime')
 
 module.exports.getType = (path = '') => {
+  if (path.endsWith('.atn')) return 'application/abraia'
   if (path.endsWith('.m3u8')) return 'application/x-mpegURL'
   return mime.getType(path) || ''
 }
@@ -32,6 +33,10 @@ module.exports.dateFormat = (timestamp) => {
   }
   return strDate;
 };
+
+module.exports.sortFiles = (files, type) => {
+  return files.sort((a, b) => b[type] < a[type] ? -1 : b[type] > a[type] ? 1 : 0);
+}
 
 module.exports.parseUrl = (src = '') => {
   const [url, query] = src.split('?')
@@ -115,6 +120,7 @@ module.exports.transformActionImage = (path, params, json) => {
           obj.src = `${background}?width=${width}&height=${height}`
           obj.cropX = 0
           obj.cropY = 0
+          id += 1
         }
       }
     })
@@ -134,6 +140,7 @@ module.exports.transformActionVideo = (path, params, json) => {
         // obj.cropX = 0
         // obj.cropY = 0
         obj.src = src
+        id += 1
       }
     }
   })
