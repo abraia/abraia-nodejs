@@ -87,18 +87,40 @@ module.exports.parseActionImage = (json) => {
   return {}
 }
 
-module.exports.parseActionVideo = (json) => {
-  const background = json.background || 'white'
+module.exports.parseActionImage = (json) => {
+  // TODO: Merge with parseActionVideo and remove backgroundImage
+  if (json.backgroundImage) {
+    const { url, query } = this.parseUrl(json.backgroundImage.src)
+    const path = url.split('/').slice(4).join('/')
+    const params = this.parseQuery(query)
+    return { path, params }
+  }
   const videos = json.objects.filter(obj => obj.type === 'video')
-  const video = videos.pop()
-  if (video) {
+  if (videos.length === 0) {
+    const images = json.objects.filter(obj => obj.type === 'image')
+    if (images.length > 0) {
+      const { src } = images[0]
+      const path = src.split('/').slice(4).join('/')
+      return { path }
+    }
+  }
+  return {}
+}
+
+module.exports.parseActionVideo = (json) => {
+  const background = json.background || '#FFFFFF'
+  const videos = json.objects.filter(obj => obj.type === 'video')
+  if (videos.length > 0) {
+    const video = videos.pop()
     const { src } = video
-    const width = json.width / json.zoom
-    const height = json.height / json.zoom
-    const videoWidth = video.width * video.scaleX
-    const videoHeight = video.height * video.scaleY
+    const width = Math.round(json.width / (json.zoom || 1))
+    const height = Math.round(json.height / (json.zoom || 1))
+    const videoWidth = Math.round(video.width * video.scaleX)
+    const videoHeight = Math.round(video.height * video.scaleY)
     const mode = (videoWidth >= width && videoHeight >= height) ? 'crop' : 'pad'
-    const params = { width, height, mode, background }
+    const left = (video.left - width / 2)
+    const top = (video.top - height / 2)
+    const params = { left, top, width, height, mode, background }
     const path = src.split('/').slice(4).join('/')
     return { path, params }
   }

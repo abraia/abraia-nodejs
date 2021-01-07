@@ -174,9 +174,9 @@ module.exports.Client = class Client {
 
   async transformImage(path, params = {}) {
     if (params.action) {
-      params.background = `${API_URL}/images/${path}`
-      if (!params.fmt) params.fmt = params.background.split('.').pop()
-      path = `${path.split('/')[0]}/${params.action}`
+      const userid = path.split('/')[0]
+      if (!params.fmt) params.fmt = path.split('.').pop()
+      path = `${userid}/${params.action}`
     }
     const config = { responseType: 'arraybuffer' }
     return this.getApi(`${API_URL}/images/${path}`, params, config)
