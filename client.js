@@ -274,4 +274,8 @@ module.exports.Client = class Client {
     const name = params.output.split('/').pop()
     return { buffer, name, type: utils.getType(name) }
   }
+
+  async detectImage(path, params = {}) {
+    return this.getApi(`${API_URL}/rekognition/${path}`, params)
+  }
 }
